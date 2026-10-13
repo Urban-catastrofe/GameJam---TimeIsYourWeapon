@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6610a297f47d0b346af40052a01658dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyGunWeapon
-  projectilePrefab: {fileID: 8884475963164844320, guid: 6c416ff893cfae3489c709f6fe816f9f, type: 3}
+  projectilePrefab: {fileID: 8966472508522615305, guid: bc92db933ff59c7b19e6c6cc993dc804, type: 3}
   muzzle: {fileID: 7090283289066583121}
   target: {fileID: 0}
   projectileSpeed: 20
