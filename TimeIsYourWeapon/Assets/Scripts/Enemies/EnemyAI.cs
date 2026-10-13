@@ -1,15 +1,18 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.VFX;
 
 // Enemy-AI met states: Idle/Patrol -> Chase -> Attack -> Dead.
 // - Ziet de speler alleen binnen detectRange, binnen zijn kijkhoek en met vrije zichtlijn.
 // - Volgt de speler tot attackRange en schiet alleen als hij de speler echt kan zien.
-// - Telegraphing: de visor licht op vlak voor elk schot.
+// - Telegraphing: de visor licht op vlak voor elk schot (en elke zwaardslag).
+// - Attack modes: Ranged (schieten), Melee (zwaard) of Hybrid (schieten, maar zwaard als de speler dichtbij komt).
 // - One hit KO: roep Die() aan vanuit het kogelscript.   Testtoets: K = alle enemies dood.
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
 {
     public enum State { Idle, Patrol, Chase, Attack, Dead }
+    public enum AttackMode { Ranged, Melee, Hybrid }
 
     [Header("Status (alleen om mee te kijken tijdens Play)")]
     public State state = State.Idle;
@@ -26,11 +29,25 @@ public class EnemyAI : MonoBehaviour
     public Transform eye;                   // leeg laten: gebruikt automatisch het hoofdbot
 
     [Header("Aanvallen")]
+    public AttackMode attackMode = AttackMode.Ranged;   // Ranged = oud gedrag
     public float attackRange = 8f;          // afstand waarop hij stopt en gaat schieten
     public float shootInterval = 3.5f;      // seconden tussen schoten
     public float shootRandomness = 0.5f;    // +/- willekeur op het interval
     public float reactionTime = 0.6f;       // wachttijd voor het eerste schot
     public float turnSpeed = 8f;            // hoe snel hij naar de speler draait
+
+    [Header("Sword Combat (Melee / Hybrid)")]
+    public float meleeRange = 2f;           // afstand waarop hij stopt en de speler kan raken
+    public float meleeDamage = 40f;
+    public float meleeInterval = 1.4f;      // seconden tussen zwaardslagen
+    public float meleeRandomness = 0.3f;    // +/- willekeur op het interval
+    [Range(0f, 360f)]
+    public float meleeArc = 100f;           // de speler moet binnen deze hoek voor hem staan
+    public string slashTrigger = "Slash";   // Animator trigger voor de zwaardslag
+    public bool useAnimationEvent = false;  // true = schade komt van Animation Event OnSwordHit()
+    public float meleeHitDelay = 0.35f;     // alleen als useAnimationEvent uit staat: vertraging tot de hit
+    public AudioClip swordSwingSound;       // optioneel
+    public AudioClip swordHitSound;         // optioneel
 
     [Header("Telegraphing (waarschuwing vlak voor het schot)")]
     public float telegraphTime = 0.5f;      // hoe lang van tevoren de visor oplicht
@@ -52,6 +69,18 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Dood")]
     public float destroyAfter = 5f;         // 0 = blijft liggen
+    
+    [Header("Enemy Weapon")]
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private Transform muzzle;
+    [SerializeField] private float projectileSpeed = 20f;
+    [SerializeField] private float projectileDamage = 25f;
+    [SerializeField] private float projectileLifetime = 5f;
+    [SerializeField] private float spreadAngle = 2f;
+
+    [Header("Weapon Effects")]
+    [SerializeField] private VisualEffect muzzleFlash;
+    [SerializeField] private string muzzleFlashEvent = "Shoot";
 
     NavMeshAgent agent;
     Animator anim;
@@ -64,6 +93,11 @@ public class EnemyAI : MonoBehaviour
     float waitTimer;
     int patrolIndex;
     float recoil;
+
+    // Sword
+    bool hasSlashParam;
+    bool swinging;
+    float swingTimer = -1f;
 
     // Telegraphing
     Renderer glowRenderer;
@@ -97,6 +131,14 @@ public class EnemyAI : MonoBehaviour
         }
         if (player != null) playerCollider = player.GetComponentInChildren<Collider>();
 
+        foreach (AnimatorControllerParameter prm in anim.parameters)
+            if (prm.name == slashTrigger && prm.type == AnimatorControllerParameterType.Trigger)
+                hasSlashParam = true;
+
+        if (attackMode != AttackMode.Ranged && !hasSlashParam)
+            Debug.LogWarning("[EnemyAI] Animator op " + name + " heeft geen trigger '" + slashTrigger +
+                             "'. De zwaardslag doet nog steeds schade, maar speelt geen animatie.");
+
         FindGlowMaterial();
         ReturnToCalm();
     }
@@ -121,6 +163,8 @@ public class EnemyAI : MonoBehaviour
         }
 
         if (state == State.Dead) return;
+
+        UpdateSwing();
 
         anim.SetFloat("Speed", agent.velocity.magnitude);
         UpdateGlow();
@@ -159,7 +203,7 @@ public class EnemyAI : MonoBehaviour
         agent.SetDestination(player.position);   // NavMesh zoekt zelf een weg om muren heen
 
         // Binnen bereik EN zichtlijn -> stoppen en aanvallen
-        if (canSee && FlatDistanceToPlayer() <= attackRange)
+        if (canSee && FlatDistanceToPlayer() <= EffectiveAttackRange())
         {
             state = State.Attack;
             shootTimer = Mathf.Max(reactionTime, telegraphTime);
@@ -177,8 +221,9 @@ public class EnemyAI : MonoBehaviour
     {
         agent.isStopped = true;
 
-        // Speler uit zicht of te ver weg (+1 m speling) -> weer achtervolgen
-        if (!canSee || FlatDistanceToPlayer() > attackRange + 1f)
+        // Speler uit zicht of te ver weg (speling) -> weer achtervolgen
+        float margin = attackMode == AttackMode.Melee ? 0.5f : 1f;
+        if (!canSee || FlatDistanceToPlayer() > EffectiveAttackRange() + margin)
         {
             StartChase();
             return;
@@ -193,16 +238,98 @@ public class EnemyAI : MonoBehaviour
 
         shootTimer -= Time.deltaTime;
 
-        // Vlak voor het schot: visor laten oplichten
+        // Vlak voor de aanval: visor laten oplichten
         if (!telegraphing && shootTimer <= telegraphTime)
             StartTelegraph();
 
         if (shootTimer <= 0f)
         {
-            anim.SetTrigger("Shoot");
-            shootTimer = shootInterval + Random.Range(-shootRandomness, shootRandomness);
+            if (UseMelee())
+            {
+                StartSwing();
+                shootTimer = meleeInterval + Random.Range(-meleeRandomness, meleeRandomness);
+            }
+            else
+            {
+                anim.SetTrigger("Shoot");
+                shootTimer = shootInterval + Random.Range(-shootRandomness, shootRandomness);
+            }
             fireTimeout = 1.5f;   // vangnet als het Animation Event ontbreekt
         }
+    }
+
+    // ---------- Attack mode ----------
+
+    // Op welke afstand stopt hij met lopen en begint hij aan te vallen?
+    float EffectiveAttackRange()
+    {
+        return attackMode == AttackMode.Melee ? meleeRange : attackRange;
+    }
+
+    // Slaat hij nu met het zwaard of schiet hij?
+    bool UseMelee()
+    {
+        switch (attackMode)
+        {
+            case AttackMode.Melee:  return true;
+            case AttackMode.Hybrid: return FlatDistanceToPlayer() <= meleeRange;
+            default:                return false;
+        }
+    }
+
+    // ---------- Zwaard ----------
+
+    void StartSwing()
+    {
+        swinging = true;
+        swingTimer = useAnimationEvent ? -1f : meleeHitDelay;
+
+        if (hasSlashParam) anim.SetTrigger(slashTrigger);
+        if (swordSwingSound != null)
+            AudioSource.PlayClipAtPoint(swordSwingSound, transform.position);
+    }
+
+    void UpdateSwing()
+    {
+        if (!swinging || swingTimer <= 0f) return;
+
+        swingTimer -= Time.deltaTime;
+        if (swingTimer <= 0f) OnSwordHit();
+    }
+
+    // Animation Event op het raakmoment van de slag (alleen nodig als useAnimationEvent aan staat).
+    // Anders wordt dit automatisch aangeroepen na meleeHitDelay.
+    public void OnSwordHit()
+    {
+        if (state == State.Dead || !swinging) return;
+
+        swinging = false;
+        swingTimer = -1f;
+        telegraphing = false;
+        fireTimeout = -1f;
+
+        // Raak ik de speler? Afstand, hoek en zichtlijn moeten kloppen op het raakmoment.
+        Vector3 to = player.position - transform.position;
+        to.y = 0f;
+        bool inReach = to.magnitude <= meleeRange + 0.75f;   // beetje speling voor een stap vooruit
+        bool inArc = Vector3.Angle(transform.forward, to) <= meleeArc * 0.5f;
+
+        if (inReach && inArc && canSee)
+        {
+            ApplyMeleeDamage();
+            if (swordHitSound != null)
+                AudioSource.PlayClipAtPoint(swordHitSound, player.position);
+        }
+    }
+
+    void ApplyMeleeDamage()
+    {
+        // PAS DIT AAN aan het health-script van je speler.
+        // Nu wordt "TakeDamage(float)" aangeroepen op de speler (en zijn parents) als die methode bestaat.
+        // Voorbeeld met een eigen script:
+        //   var health = player.GetComponentInParent<PlayerHealth>();
+        //   if (health != null) health.TakeDamage(meleeDamage);
+        player.gameObject.SendMessageUpwards("TakeDamage", meleeDamage, SendMessageOptions.DontRequireReceiver);
     }
 
     // ---------- Overgangen ----------
@@ -273,7 +400,13 @@ public class EnemyAI : MonoBehaviour
     {
         telegraphing = false;
         fireTimeout = -1f;
-        if (anim != null) anim.ResetTrigger("Shoot");
+        swinging = false;
+        swingTimer = -1f;
+        if (anim != null)
+        {
+            anim.ResetTrigger("Shoot");
+            if (hasSlashParam) anim.ResetTrigger(slashTrigger);
+        }
     }
 
     void UpdateGlow()
@@ -281,7 +414,11 @@ public class EnemyAI : MonoBehaviour
         if (fireTimeout > 0f)
         {
             fireTimeout -= Time.deltaTime;
-            if (fireTimeout <= 0f) telegraphing = false;
+            if (fireTimeout <= 0f)
+            {
+                telegraphing = false;
+                swinging = false;
+            }
         }
 
         // Opbouwen in telegraphTime, snel uitdoven na het schot
@@ -344,10 +481,14 @@ public class EnemyAI : MonoBehaviour
     // Animation Event op het schietmoment in de Shooting-clip. Hier komt later de kogel.
     public void OnShootFrame()
     {
-        if (state == State.Dead) return;
+        if (state == State.Dead)
+            return;
+
         recoil = 1f;
-        telegraphing = false;   // visor dooft na het schot
+        telegraphing = false;
         fireTimeout = -1f;
+
+        FireProjectile();
     }
 
     // One hit KO: roep dit aan vanuit het kogelscript van de speler.
@@ -357,6 +498,8 @@ public class EnemyAI : MonoBehaviour
         state = State.Dead;
         recoil = 0f;
         telegraphing = false;
+        swinging = false;
+        swingTimer = -1f;
 
         agent.isStopped = true;
         agent.enabled = false;
@@ -407,10 +550,72 @@ public class EnemyAI : MonoBehaviour
         Gizmos.DrawLine(pos, pos + left * detectRange);
         Gizmos.DrawLine(pos, pos + right * detectRange);
 
+        // Zwaardbereik en slagboog
+        if (attackMode != AttackMode.Ranged)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(pos, meleeRange);
+            Vector3 mLeft = Quaternion.Euler(0f, -meleeArc * 0.5f, 0f) * transform.forward;
+            Vector3 mRight = Quaternion.Euler(0f, meleeArc * 0.5f, 0f) * transform.forward;
+            Gizmos.DrawLine(pos, pos + mLeft * meleeRange);
+            Gizmos.DrawLine(pos, pos + mRight * meleeRange);
+        }
+
         if (Application.isPlaying && player != null && eye != null)
         {
             Gizmos.color = canSee ? Color.green : Color.gray;
             Gizmos.DrawLine(eye.position, PlayerAimPoint());
         }
+    }
+    
+    private void FireProjectile()
+    {
+        if (projectilePrefab == null || muzzle == null || player == null)
+        {
+            Debug.LogWarning(
+                $"[{name}] Cannot shoot: projectile prefab, muzzle, or player is missing.",
+                this);
+            return;
+        }
+
+        // Aim towards the player's collider centre.
+        Vector3 targetPosition = PlayerAimPoint();
+        Vector3 direction = (targetPosition - muzzle.position).normalized;
+
+        // Add a little inaccuracy.
+        direction = Quaternion.Euler(
+            Random.Range(-spreadAngle, spreadAngle),
+            Random.Range(-spreadAngle, spreadAngle),
+            0f
+        ) * direction;
+
+        // Play the enemy's own muzzle flash.
+        if (muzzleFlash != null)
+            muzzleFlash.SendEvent(muzzleFlashEvent);
+
+        // Create the projectile.
+        GameObject bullet = Instantiate(
+            projectilePrefab,
+            muzzle.position,
+            Quaternion.LookRotation(direction));
+
+        Projectile projectile = bullet.GetComponent<Projectile>();
+
+        if (projectile == null)
+        {
+            Debug.LogError(
+                $"[{name}] Projectile prefab has no Projectile component on its root.",
+                bullet);
+
+            Destroy(bullet);
+            return;
+        }
+
+        // Configure this projectile for the enemy's weapon.
+        projectile.Initialize(
+            direction,
+            projectileSpeed,
+            projectileDamage,
+            projectileLifetime);
     }
 }
