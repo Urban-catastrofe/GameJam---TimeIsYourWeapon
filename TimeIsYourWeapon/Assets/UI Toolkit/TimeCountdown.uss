@@ -101,7 +101,7 @@
     white-space: nowrap;
 
     transition-property: translate, opacity;
-    transition-duration: 2000ms;
+    transition-duration: 750ms;
     transition-timing-function: ease-out;
 }
 

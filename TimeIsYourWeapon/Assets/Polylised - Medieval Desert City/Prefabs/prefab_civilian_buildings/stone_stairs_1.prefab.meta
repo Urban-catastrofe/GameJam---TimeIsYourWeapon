@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 88a6a162f1dc3893a8993327cc76dab4
+timeCreated: 1496978822
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/stone_stairs_1.prefab
+  uploadId: 723546

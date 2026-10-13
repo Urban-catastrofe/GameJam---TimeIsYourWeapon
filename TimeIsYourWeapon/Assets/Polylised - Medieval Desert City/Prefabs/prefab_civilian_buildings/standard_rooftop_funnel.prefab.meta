@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0abdd3bb6399c24e6a9461bf0448f1e0
+timeCreated: 1496978806
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/standard_rooftop_funnel.prefab
+  uploadId: 723546

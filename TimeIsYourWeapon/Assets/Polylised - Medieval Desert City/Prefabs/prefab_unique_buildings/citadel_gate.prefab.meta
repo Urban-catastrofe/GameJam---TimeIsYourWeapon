@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 805d50e576affd68995f8df62abcf510
+timeCreated: 1496978630
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_unique_buildings/citadel_gate.prefab
+  uploadId: 723546

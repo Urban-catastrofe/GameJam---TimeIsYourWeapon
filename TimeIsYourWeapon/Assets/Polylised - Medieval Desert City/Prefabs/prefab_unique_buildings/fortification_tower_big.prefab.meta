@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: af01b9d4ef4025c5bb1c4f0a8e400f69
+timeCreated: 1497259066
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_unique_buildings/fortification_tower_big.prefab
+  uploadId: 723546
