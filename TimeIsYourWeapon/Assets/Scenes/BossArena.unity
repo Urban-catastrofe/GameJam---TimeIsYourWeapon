@@ -3255,7 +3255,7 @@ MonoBehaviour:
   enemyBossSpawnTag: EnemyBossSpawnPoint
   playerPrefab: {fileID: 991824196741141056, guid: 8e2675cf30a2785608815973f78211f0, type: 3}
   teleportExistingPlayer: 1
-  enemyPrefab: {fileID: 3992380787364986185, guid: 7fd451fa43292524da5f97b0eceedeb0, type: 3}
+  enemyPrefab: {fileID: 3992380787364986185, guid: 23f71f086329a074f9c39fe6f3948038, type: 3}
   enemyCount: 7
   shuffleSpawnPoints: 1
   samePointSpread: 0.8
