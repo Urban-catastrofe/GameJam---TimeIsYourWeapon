@@ -13,6 +13,7 @@ public class LevelManager : MonoBehaviour
     [Header("Spawn point tags")]
     public string playerSpawnTag = "PlayerSpawnPoint";
     public string enemySpawnTag = "EnemySpawnPoint";
+    public string enemyBossSpawnTag = "EnemyBossSpawnPoint";
 
     [Header("Player")]
     public GameObject playerPrefab;
@@ -23,6 +24,18 @@ public class LevelManager : MonoBehaviour
     public int enemyCount = 5;
     public bool shuffleSpawnPoints = false;
     public float samePointSpread = 0.8f;
+
+    [Header("Boss config")]
+    public bool enemyBossEnabled = false;
+    public GameObject enemyBossPrefab;
+    public bool enemyBossReinforcement = false;
+    [Range(4, 30)]
+    public float enemyBossReinforcementDelay = 5.0f;
+    [Range(1, 10)]
+    public int amountOfReinforcementsMin = 1;
+    [Range(1, 10)]
+    public int amountOfReinforcementsMax = 5;
+
 
     [Header("Flow")]
     public bool autoStart = true;
@@ -38,6 +51,8 @@ public class LevelManager : MonoBehaviour
     
     public int AliveEnemies => enemies.Count;
     public int Kills => TotalEnemies - AliveEnemies;
+    private float timeManager;
+    private bool isBossDead = false;
 
     readonly List<GameObject> enemies = new List<GameObject>();
 
@@ -66,13 +81,28 @@ public class LevelManager : MonoBehaviour
         {
             return;
         }
-
+        
+        timeManager = 0f;
+        isBossDead = false;
+        TotalEnemies = 0;
         IsRunning = true;
         IsComplete = false;
         enemies.Clear();
 
         SpawnPlayer();
-        SpawnEnemies();
+        SpawnEnemies(enemyCount);
+        
+        if(enemyBossEnabled && enemyBossPrefab != null)
+        {
+            Transform bossPoint = FindFirstTagged(enemyBossSpawnTag);
+            if (bossPoint != null)
+            {
+                GameObject boss = Instantiate(enemyBossPrefab, bossPoint.position, bossPoint.rotation);
+                boss.name = $"{enemyBossPrefab.name}_Boss";
+                enemies.Add(boss);
+                TotalEnemies++;
+            }
+        }
 
         onLevelStart?.Invoke();
         Debug.Log($"Level started - enemies: {TotalEnemies}");
@@ -92,12 +122,13 @@ public class LevelManager : MonoBehaviour
         //player.transform.SetPositionAndRotation(point.position, point.rotation);
     }
 
-    void SpawnEnemies()
+    void SpawnEnemies(int amount = 0)
     {
         List<Transform> points = FindAllTagged(enemySpawnTag);
         if (shuffleSpawnPoints) Shuffle(points);
 
-        TotalEnemies = Mathf.Max(0, enemyCount);
+        var cachedTotalEnemies = TotalEnemies;
+        TotalEnemies = Mathf.Max(0, amount);
         for (int i = 0; i < TotalEnemies; i++)
         {
             Transform point = points[i % points.Count];
@@ -114,7 +145,8 @@ public class LevelManager : MonoBehaviour
             enemy.name = $"{enemyPrefab.name}_{i + 1:00}";
             enemies.Add(enemy);
         }
-
+        
+        TotalEnemies += cachedTotalEnemies;
         onEnemyCountChanged?.Invoke(AliveEnemies, TotalEnemies);
     }
 
@@ -129,6 +161,33 @@ public class LevelManager : MonoBehaviour
     void Update()
     {
         if (!IsRunning) return;
+        
+        if(enemyBossReinforcement && !isBossDead)
+        {
+            timeManager += Time.deltaTime;
+            
+            if(timeManager >= enemyBossReinforcementDelay)
+            {
+                Debug.Log("Spawning enemy reinforcements.");
+                int reinforcements = Random.Range((int)amountOfReinforcementsMin, (int)amountOfReinforcementsMax + 1);
+                SpawnEnemies(reinforcements);
+                timeManager = 0f;
+            }
+        }
+        
+        if(enemyBossEnabled && !isBossDead)
+        {
+            bool bossAlive = false;
+            foreach(GameObject enemy in enemies)
+            {
+                if(enemy != null && enemy.CompareTag("EnemyBoss"))
+                {
+                    bossAlive = true;
+                    break;
+                }
+            }
+            isBossDead = !bossAlive;
+        }
         
         if (enemies.RemoveAll(e => e == null) > 0)
         {
