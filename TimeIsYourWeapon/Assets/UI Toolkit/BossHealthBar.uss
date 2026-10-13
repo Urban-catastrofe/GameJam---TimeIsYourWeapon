@@ -1,0 +1,63 @@
+.boss-hud-root {
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: 32px;
+
+    align-items: stretch;
+
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 400ms;
+    transition-timing-function: ease-out;
+}
+
+.boss-hud-root.is-visible {
+    opacity: 1;
+}
+
+.boss-name-label {
+    color: rgb(245, 248, 255);
+    font-size: 24px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    margin: 0 0 6px 0;
+}
+
+.boss-bar-frame {
+    height: 22px;
+
+    background-color: rgba(15, 24, 40, 0.94);
+    border-width: 2px;
+    border-color: rgb(73, 119, 170);
+    border-radius: 6px;
+
+    overflow: hidden;
+}
+
+.boss-bar-fill,
+.boss-bar-trail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.boss-bar-fill {
+    background-color: rgb(255, 65, 80);
+    transition-property: width;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+}
+
+/* Lags behind the fill so the chunk of damage taken stays visible for a moment */
+.boss-bar-trail {
+    background-color: rgb(255, 214, 120);
+    transition-property: width;
+    transition-duration: 600ms;
+    transition-delay: 350ms;
+    transition-timing-function: ease-in-out;
+}

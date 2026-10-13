@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/BossHealthBar.uss?fileID=7433441132597879392&amp;guid=98d6d59d728444068c3af777b0f8b95e&amp;type=3#BossHealthBar"/>
+    <ui:VisualElement name="BossHUDRoot" class="boss-hud-root" picking-mode="Ignore">
+        <ui:Label text="BOSS" name="BossNameLabel" class="boss-name-label" picking-mode="Ignore"/>
+        <ui:VisualElement name="BossBarFrame" class="boss-bar-frame" picking-mode="Ignore">
+            <ui:VisualElement name="BossBarTrail" class="boss-bar-trail" picking-mode="Ignore"/>
+            <ui:VisualElement name="BossBarFill" class="boss-bar-fill" picking-mode="Ignore"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
