@@ -459,6 +459,10 @@ public class EnemyAI : MonoBehaviour
 
         if (destroyAfter > 0f)
             Destroy(gameObject, destroyAfter);
+
+        // Tel de kill meteen, ook als het lichaam nog blijft liggen.
+        if (LevelManager.Instance != null)
+            LevelManager.Instance.NotifyEnemyKilled(gameObject);
     }
 
     // ---------- Recoil (na de animatie) ----------

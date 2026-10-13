@@ -52,7 +52,7 @@ public class LevelManager : MonoBehaviour
     public int AliveEnemies => enemies.Count;
     public int Kills => TotalEnemies - AliveEnemies;
     private float timeManager;
-    private bool isBossDead = false;
+    private GameObject bossInstance;
 
     readonly List<GameObject> enemies = new List<GameObject>();
 
@@ -83,7 +83,7 @@ public class LevelManager : MonoBehaviour
         }
         
         timeManager = 0f;
-        isBossDead = false;
+        bossInstance = null;
         TotalEnemies = 0;
         IsRunning = true;
         IsComplete = false;
@@ -97,14 +97,15 @@ public class LevelManager : MonoBehaviour
             Transform bossPoint = FindFirstTagged(enemyBossSpawnTag);
             if (bossPoint != null)
             {
-                GameObject boss = Instantiate(enemyBossPrefab, bossPoint.position, bossPoint.rotation);
-                boss.name = $"{enemyBossPrefab.name}_Boss";
-                enemies.Add(boss);
+                bossInstance = Instantiate(enemyBossPrefab, bossPoint.position, bossPoint.rotation);
+                bossInstance.name = $"{enemyBossPrefab.name}_Boss";
+                enemies.Add(bossInstance);
                 TotalEnemies++;
             }
         }
 
         onLevelStart?.Invoke();
+        onEnemyCountChanged?.Invoke(AliveEnemies, TotalEnemies);
         Debug.Log($"Level started - enemies: {TotalEnemies}");
     }
 
@@ -124,12 +125,25 @@ public class LevelManager : MonoBehaviour
 
     void SpawnEnemies(int amount = 0)
     {
+        int amountToSpawn = Mathf.Max(0, amount);
+        if (amountToSpawn == 0) return;
+
+        if (enemyPrefab == null)
+        {
+            Debug.LogWarning("[LevelManager] Cannot spawn enemies: no enemy prefab assigned.", this);
+            return;
+        }
+
         List<Transform> points = FindAllTagged(enemySpawnTag);
+        if (points.Count == 0)
+        {
+            Debug.LogWarning($"[LevelManager] Cannot spawn enemies: no points tagged '{enemySpawnTag}'.", this);
+            return;
+        }
+
         if (shuffleSpawnPoints) Shuffle(points);
 
-        var cachedTotalEnemies = TotalEnemies;
-        TotalEnemies = Mathf.Max(0, amount);
-        for (int i = 0; i < TotalEnemies; i++)
+        for (int i = 0; i < amountToSpawn; i++)
         {
             Transform point = points[i % points.Count];
             Vector3 position = point.position;
@@ -144,25 +158,36 @@ public class LevelManager : MonoBehaviour
             GameObject enemy = Instantiate(enemyPrefab, position, point.rotation);
             enemy.name = $"{enemyPrefab.name}_{i + 1:00}";
             enemies.Add(enemy);
+            TotalEnemies++;
         }
-        
-        TotalEnemies += cachedTotalEnemies;
-        onEnemyCountChanged?.Invoke(AliveEnemies, TotalEnemies);
     }
 
     public void NotifyEnemyKilled(GameObject enemy)
     {
-        if (enemy != null && enemies.Remove(enemy))
+        // Removing the registered instance also makes repeated death reports harmless.
+        if (enemy == null || !enemies.Remove(enemy)) return;
+
+        if (enemy == bossInstance)
         {
-            NotifyChanged();
+            bossInstance = null;
+            timeManager = 0f;
         }
+
+        NotifyChanged();
     }
 
     void Update()
     {
         if (!IsRunning) return;
-        
-        if(enemyBossReinforcement && !isBossDead)
+
+        // Fallback for enemies removed without going through their death handler.
+        if (enemies.RemoveAll(e => e == null) > 0)
+        {
+            NotifyChanged();
+            if (!IsRunning) return;
+        }
+
+        if (enemyBossEnabled && enemyBossReinforcement && bossInstance != null)
         {
             timeManager += Time.deltaTime;
             
@@ -172,26 +197,8 @@ public class LevelManager : MonoBehaviour
                 int reinforcements = Random.Range((int)amountOfReinforcementsMin, (int)amountOfReinforcementsMax + 1);
                 SpawnEnemies(reinforcements);
                 timeManager = 0f;
+                NotifyChanged();
             }
-        }
-        
-        if(enemyBossEnabled && !isBossDead)
-        {
-            bool bossAlive = false;
-            foreach(GameObject enemy in enemies)
-            {
-                if(enemy != null && enemy.CompareTag("EnemyBoss"))
-                {
-                    bossAlive = true;
-                    break;
-                }
-            }
-            isBossDead = !bossAlive;
-        }
-        
-        if (enemies.RemoveAll(e => e == null) > 0)
-        {
-            NotifyChanged();
         }
 
         CheckComplete();
@@ -205,7 +212,7 @@ public class LevelManager : MonoBehaviour
 
     void CheckComplete()
     {
-        if (IsComplete || TotalEnemies <= 0 || AliveEnemies > 0) return;
+        if (!IsRunning || IsComplete || TotalEnemies <= 0 || AliveEnemies > 0) return;
 
         IsComplete = true;
         IsRunning = false;
