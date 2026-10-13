@@ -360,20 +360,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelSelectBehavior
   levels:
-  - displayName: Cas
-    sceneName: Test scene Cas
-  - displayName: Lucas
-    sceneName: Test scene Lucas
-  - displayName: Nils
-    sceneName: Test scene Nils
-  - displayName: Roald
-    sceneName: Test scene Roald
-  - displayName: Simme
-    sceneName: Test scene Simme
-  - displayName: Stijn
-    sceneName: Test scene Stijn
-  - displayName: Sybren
-    sceneName: Test scene Sybren
+  - displayName: Level 1
+    sceneName: Level 1
+  - displayName: Boss
+    sceneName: BossArena
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
