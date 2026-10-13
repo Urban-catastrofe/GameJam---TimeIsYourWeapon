@@ -3,7 +3,22 @@ guid: 8344beac1af233519892ab23cb2e01a5
 ModelImporter:
   serializedVersion: 24501
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Enemy_Accent
+    second: {fileID: 2100000, guid: 7dff54f40e6b12f1891355cb965d9db3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Enemy_Glow
+    second: {fileID: 2100000, guid: a842f3f1cc401e9beadf1c23f4d90ab2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Enemy_Main
+    second: {fileID: 2100000, guid: ba2d1e824237d8e95898279d94507d43, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -4,6 +4,7 @@ using UnityEngine.AI;
 // Enemy-AI met states: Idle/Patrol -> Chase -> Attack -> Dead.
 // - Ziet de speler alleen binnen detectRange, binnen zijn kijkhoek en met vrije zichtlijn.
 // - Volgt de speler tot attackRange en schiet alleen als hij de speler echt kan zien.
+// - Telegraphing: de visor licht op vlak voor elk schot.
 // - One hit KO: roep Die() aan vanuit het kogelscript.   Testtoets: K = alle enemies dood.
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
@@ -31,6 +32,13 @@ public class EnemyAI : MonoBehaviour
     public float reactionTime = 0.6f;       // wachttijd voor het eerste schot
     public float turnSpeed = 8f;            // hoe snel hij naar de speler draait
 
+    [Header("Telegraphing (waarschuwing vlak voor het schot)")]
+    public float telegraphTime = 0.5f;      // hoe lang van tevoren de visor oplicht
+    public Color telegraphColor = new Color(1f, 0.08f, 0.05f);   // felrood
+    public float telegraphIntensity = 8f;   // gloei-sterkte (hoger = feller, werkt met Bloom)
+    public string glowMaterialName = "Enemy_Glow";              // materiaal dat oplicht
+    public AudioClip telegraphSound;        // optioneel: geluidje bij het oplichten
+
     [Header("Bewegen")]
     public float patrolSpeed = 1.2f;
     public float chaseSpeed = 2f;
@@ -57,6 +65,16 @@ public class EnemyAI : MonoBehaviour
     int patrolIndex;
     float recoil;
 
+    // Telegraphing
+    Renderer glowRenderer;
+    int glowIndex = -1;
+    MaterialPropertyBlock mpb;
+    Color baseGlowColor = Color.white;      // originele kleur van het glow-materiaal
+    Color baseGlowEmission = Color.black;   // originele emissie van het glow-materiaal
+    bool telegraphing;
+    float fireTimeout = -1f;
+    float glow;                             // 0 = normaal, 1 = volledig opgelicht
+
     public bool IsDead => state == State.Dead;
 
     void Start()
@@ -79,6 +97,7 @@ public class EnemyAI : MonoBehaviour
         }
         if (player != null) playerCollider = player.GetComponentInChildren<Collider>();
 
+        FindGlowMaterial();
         ReturnToCalm();
     }
 
@@ -101,8 +120,10 @@ public class EnemyAI : MonoBehaviour
             case State.Attack: UpdateAttack(); break;
         }
 
-        if (state != State.Dead)
-            anim.SetFloat("Speed", agent.velocity.magnitude);
+        if (state == State.Dead) return;
+
+        anim.SetFloat("Speed", agent.velocity.magnitude);
+        UpdateGlow();
     }
 
     // ---------- States ----------
@@ -141,7 +162,7 @@ public class EnemyAI : MonoBehaviour
         if (canSee && FlatDistanceToPlayer() <= attackRange)
         {
             state = State.Attack;
-            shootTimer = reactionTime;
+            shootTimer = Mathf.Max(reactionTime, telegraphTime);
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
             return;
@@ -171,10 +192,16 @@ public class EnemyAI : MonoBehaviour
                 Quaternion.LookRotation(flat), turnSpeed * Time.deltaTime);
 
         shootTimer -= Time.deltaTime;
+
+        // Vlak voor het schot: visor laten oplichten
+        if (!telegraphing && shootTimer <= telegraphTime)
+            StartTelegraph();
+
         if (shootTimer <= 0f)
         {
             anim.SetTrigger("Shoot");
             shootTimer = shootInterval + Random.Range(-shootRandomness, shootRandomness);
+            fireTimeout = 1.5f;   // vangnet als het Animation Event ontbreekt
         }
     }
 
@@ -185,10 +212,12 @@ public class EnemyAI : MonoBehaviour
         state = State.Chase;
         lastSeenTime = Time.time;
         agent.isStopped = false;
+        CancelTelegraph();
     }
 
     void ReturnToCalm()
     {
+        CancelTelegraph();
         if (patrolPoints != null && patrolPoints.Length > 0)
         {
             state = State.Patrol;
@@ -208,6 +237,74 @@ public class EnemyAI : MonoBehaviour
         waitTimer = waitAtPoint;
     }
 
+    // ---------- Telegraphing ----------
+
+    void FindGlowMaterial()
+    {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            Material[] mats = r.sharedMaterials;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                if (mats[i] != null && mats[i].name.Contains(glowMaterialName))
+                {
+                    glowRenderer = r;
+                    glowIndex = i;
+                    if (mats[i].HasProperty("_BaseColor")) baseGlowColor = mats[i].GetColor("_BaseColor");
+                    else if (mats[i].HasProperty("_Color")) baseGlowColor = mats[i].GetColor("_Color");
+                    if (mats[i].HasProperty("_EmissionColor")) baseGlowEmission = mats[i].GetColor("_EmissionColor");
+                    mpb = new MaterialPropertyBlock();
+                    return;
+                }
+            }
+        }
+        Debug.LogWarning("[EnemyAI] Geen materiaal met de naam '" + glowMaterialName +
+                         "' gevonden op " + name + ". Telegraphing is uitgeschakeld.");
+    }
+
+    void StartTelegraph()
+    {
+        telegraphing = true;
+        if (telegraphSound != null)
+            AudioSource.PlayClipAtPoint(telegraphSound, eye.position);
+    }
+
+    void CancelTelegraph()
+    {
+        telegraphing = false;
+        fireTimeout = -1f;
+        if (anim != null) anim.ResetTrigger("Shoot");
+    }
+
+    void UpdateGlow()
+    {
+        if (fireTimeout > 0f)
+        {
+            fireTimeout -= Time.deltaTime;
+            if (fireTimeout <= 0f) telegraphing = false;
+        }
+
+        // Opbouwen in telegraphTime, snel uitdoven na het schot
+        if (telegraphing)
+            glow = Mathf.MoveTowards(glow, 1f, Time.deltaTime / Mathf.Max(0.01f, telegraphTime));
+        else
+            glow = Mathf.MoveTowards(glow, 0f, Time.deltaTime * 6f);
+
+        Color emission = Color.Lerp(baseGlowEmission, telegraphColor * telegraphIntensity, glow * glow);
+        Color baseCol = Color.Lerp(baseGlowColor, telegraphColor, glow);
+        SetGlow(baseCol, emission);
+    }
+
+    void SetGlow(Color baseCol, Color emission)
+    {
+        if (glowRenderer == null) return;
+        glowRenderer.GetPropertyBlock(mpb, glowIndex);
+        mpb.SetColor("_BaseColor", baseCol);       // URP
+        mpb.SetColor("_Color", baseCol);           // Built-in
+        mpb.SetColor("_EmissionColor", emission);
+        glowRenderer.SetPropertyBlock(mpb, glowIndex);
+    }
+
     // ---------- Zien ----------
 
     Vector3 PlayerAimPoint()
@@ -222,7 +319,6 @@ public class EnemyAI : MonoBehaviour
         return d.magnitude;
     }
 
-    // Staat de speler binnen de kijkhoek? (alleen nodig zolang hij de speler nog niet heeft gezien)
     bool InViewCone()
     {
         Vector3 to = player.position - transform.position;
@@ -230,7 +326,6 @@ public class EnemyAI : MonoBehaviour
         return Vector3.Angle(transform.forward, to) <= viewAngle * 0.5f;
     }
 
-    // Binnen bereik en niets tussen het oog en de speler?
     bool CanSeePlayer()
     {
         Vector3 from = eye.position;
@@ -241,7 +336,7 @@ public class EnemyAI : MonoBehaviour
         if (Physics.Raycast(from, dir / dist, out RaycastHit hit, dist + 0.5f, sightMask, QueryTriggerInteraction.Ignore))
             return hit.transform == player || hit.transform.IsChildOf(player);
 
-        return true; // niets geraakt = niets in de weg
+        return true;
     }
 
     // ---------- Schieten & dood ----------
@@ -251,6 +346,8 @@ public class EnemyAI : MonoBehaviour
     {
         if (state == State.Dead) return;
         recoil = 1f;
+        telegraphing = false;   // visor dooft na het schot
+        fireTimeout = -1f;
     }
 
     // One hit KO: roep dit aan vanuit het kogelscript van de speler.
@@ -259,12 +356,16 @@ public class EnemyAI : MonoBehaviour
         if (state == State.Dead) return;
         state = State.Dead;
         recoil = 0f;
+        telegraphing = false;
 
         agent.isStopped = true;
         agent.enabled = false;
 
         foreach (Collider c in GetComponentsInChildren<Collider>())
             c.enabled = false;
+
+        // Visor gaat uit als hij dood is
+        SetGlow(baseGlowColor * 0.2f, Color.black);
 
         anim.SetFloat("Speed", 0f);
         anim.SetTrigger("Die");
@@ -294,13 +395,13 @@ public class EnemyAI : MonoBehaviour
     {
         Vector3 pos = transform.position + Vector3.up * 0.1f;
 
-        Gizmos.color = Color.yellow;                       // detectie-afstand
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(pos, detectRange);
 
-        Gizmos.color = Color.red;                          // schietafstand
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(pos, attackRange);
 
-        Gizmos.color = Color.cyan;                         // kijkhoek
+        Gizmos.color = Color.cyan;
         Vector3 left = Quaternion.Euler(0f, -viewAngle * 0.5f, 0f) * transform.forward;
         Vector3 right = Quaternion.Euler(0f, viewAngle * 0.5f, 0f) * transform.forward;
         Gizmos.DrawLine(pos, pos + left * detectRange);
@@ -308,7 +409,7 @@ public class EnemyAI : MonoBehaviour
 
         if (Application.isPlaying && player != null && eye != null)
         {
-            Gizmos.color = canSee ? Color.green : Color.gray; // zichtlijn
+            Gizmos.color = canSee ? Color.green : Color.gray;
             Gizmos.DrawLine(eye.position, PlayerAimPoint());
         }
     }
