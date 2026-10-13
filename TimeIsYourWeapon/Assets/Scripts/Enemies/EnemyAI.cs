@@ -447,6 +447,7 @@ public class EnemyAI : MonoBehaviour
     {
         if (state == State.Dead) return;
         TimeManager.Instance.AddSeconds(Random.Range(timeAddedMin, timeAddedMax));
+        TimeManager.Instance.SetTimeScaleState(TimeManager.TimeScaleState.Killed);
         state = State.Dead;
         recoil = 0f;
         if (currentHealth != 0)

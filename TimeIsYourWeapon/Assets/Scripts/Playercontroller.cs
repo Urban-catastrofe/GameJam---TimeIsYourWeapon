@@ -72,7 +72,24 @@ public class PlayerController : MonoBehaviour
         Vector3 move = transform.TransformDirection(input) * walkSpeed;
 
         MoveAmount = input.magnitude;
-        Debug.Log(MoveAmount);
+
+        // Adjust time scale
+        if (Mathf.Approximately(MoveAmount, 1))
+        {
+            // Player is moving, set timeScale to Moving
+            TimeManager.Instance.SetTimeScaleState(TimeManager.TimeScaleState.Moving);
+        }
+        else if (Mathf.Abs(Input.GetAxis("Mouse X")) > 0.01f ||
+                 Mathf.Abs(Input.GetAxis("Mouse Y")) > 0.01f)
+        {
+            // Player is looking around, set timeScale to Rotating
+            TimeManager.Instance.SetTimeScaleState(TimeManager.TimeScaleState.Rotating);
+        }
+        else
+        {
+            // Player is not moving or looking around, set timeScale to Standing
+            TimeManager.Instance.SetTimeScaleState(TimeManager.TimeScaleState.Standing);
+        }
 
         // ---- Zwaartekracht & springen ----
         if (controller.isGrounded && verticalVelocity < 0f)
