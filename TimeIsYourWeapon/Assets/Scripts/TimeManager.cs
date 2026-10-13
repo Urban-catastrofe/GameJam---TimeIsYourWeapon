@@ -23,14 +23,14 @@ public class TimeManager : MonoBehaviour
         Instance = this;
         
         originalFixedDeltaTime = Time.fixedDeltaTime;
-        
-        OnTimeScaleChange?.Invoke(1.0f);
-        OnTimeRemainingChange?.Invoke(secondsRemaining);
     }
 
     void Start()
     {
         StartCoroutine(StartCountdown());
+        
+        OnTimeScaleChange?.Invoke(1.0f);
+        OnTimeRemainingChange?.Invoke(secondsRemaining);
     }
 
     private IEnumerator StartCountdown()
