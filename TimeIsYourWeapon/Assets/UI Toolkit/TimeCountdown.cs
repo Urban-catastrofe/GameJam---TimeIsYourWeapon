@@ -40,11 +40,14 @@ public class TimeCountdown : MonoBehaviour
 
     private void OnTimeScaleChanged(float timeScale)
     {
-        timeScaleLabel.text = $"Time scale: {timeScale:F1}x";
+        if (timeScaleLabel != null)
+            timeScaleLabel.text = $"Time scale: {timeScale:F1}x";
     }
 
     private void UpdateTimer(float seconds)
     {
+        if (timerLabel == null) return;
+        
         seconds = Mathf.Max(0, seconds);
 
         int minutes = Mathf.FloorToInt(seconds / 60);

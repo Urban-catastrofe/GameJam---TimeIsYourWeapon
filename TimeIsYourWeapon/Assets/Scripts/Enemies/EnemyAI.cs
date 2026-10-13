@@ -64,6 +64,8 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Dood")]
     public float destroyAfter = 5f;         // 0 = blijft liggen
+    public float timeAddedMin = 2f;
+    public float timeAddedMax = 10f;
 
     NavMeshAgent agent;
     Animator anim;
@@ -433,7 +435,7 @@ public class EnemyAI : MonoBehaviour
     public void Die()
     {
         if (state == State.Dead) return;
-        TimeManager.Instance.AddSeconds(Random.Range(1.0f, 5.0f));
+        TimeManager.Instance.AddSeconds(Random.Range(timeAddedMin, timeAddedMax));
         state = State.Dead;
         recoil = 0f;
         if (currentHealth != 0)
