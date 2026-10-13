@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Menu.uss?fileID=7433441132597879392&amp;guid=831e3bbb88545513fa31aac738c406bc&amp;type=3#Menu"/>
+    <Style src="project://database/Assets/UI%20Toolkit/Casino.uss?fileID=7433441132597879392&amp;guid=f2ecdaa370804cd4b14d8fdbf3ddb2d2&amp;type=3#Casino"/>
+    <Style src="project://database/Assets/UI%20Toolkit/LevelSelect.uss?fileID=7433441132597879392&amp;guid=ea74945b0d034503939803e5dd033575&amp;type=3#LevelSelect"/>
+    <ui:VisualElement name="Background" class="casino-background">
+        <ui:VisualElement name="Container" class="casino-container">
+            <ui:Label text="Select Level" class="casino-title"/>
+            <ui:ScrollView name="LevelScroll" class="level-scroll">
+                <ui:VisualElement name="LevelGrid" class="level-grid"/>
+            </ui:ScrollView>
+            <ui:Button text="Return" name="ReturnButton" class="button casino-return"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

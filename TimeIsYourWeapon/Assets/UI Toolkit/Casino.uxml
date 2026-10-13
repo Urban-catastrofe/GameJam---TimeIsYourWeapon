@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Menu.uss?fileID=7433441132597879392&amp;guid=831e3bbb88545513fa31aac738c406bc&amp;type=3#Menu"/>
+    <Style src="project://database/Assets/UI%20Toolkit/Casino.uss?fileID=7433441132597879392&amp;guid=f2ecdaa370804cd4b14d8fdbf3ddb2d2&amp;type=3#Casino"/>
+    <ui:VisualElement name="Background" class="casino-background">
+        <ui:VisualElement name="Container" class="casino-container">
+            <ui:Label text="Casino" class="casino-title"/>
+            <ui:Label name="TimeLabel" text="0:00" class="casino-time"/>
+            <ui:VisualElement name="Columns" class="casino-columns">
+                <ui:VisualElement name="ShopPanel" class="casino-panel">
+                    <ui:Label text="Upgrades" class="casino-heading"/>
+                    <ui:ScrollView name="ShopList" class="casino-shop"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="GamblePanel" class="casino-panel">
+                    <ui:Label text="Gamble" class="casino-heading"/>
+                    <ui:Label name="StakeLabel" text="Stake: 0:05" class="casino-text"/>
+                    <ui:SliderInt name="StakeSlider" low-value="1" high-value="10" value="5" class="casino-slider"/>
+                    <ui:Button text="Coin Flip" name="CoinFlipButton" class="button casino-button"/>
+                    <ui:Button text="Dice Roll" name="DiceButton" class="button casino-button"/>
+                    <ui:Label name="ResultLabel" text="" class="casino-text casino-result"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button text="Return" name="ReturnButton" class="button casino-return"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
