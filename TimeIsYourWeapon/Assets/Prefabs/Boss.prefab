@@ -260,7 +260,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 58687072eefec0f23981df7795b6ce1c, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: b00362710b42f9a4a9b7983a99bce2df, type: 2}
+      objectReference: {fileID: 22100000, guid: e97726d17ffe27c40986f67036d50968, type: 2}
     - target: {fileID: 5866666021909216657, guid: 58687072eefec0f23981df7795b6ce1c, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -363,7 +363,7 @@ MonoBehaviour:
     m_Bits: 115
   eye: {fileID: 0}
   attackRange: 12
-  shootInterval: 3.5
+  shootInterval: 5
   shootRandomness: 0.5
   reactionTime: 0.6
   turnSpeed: 8
