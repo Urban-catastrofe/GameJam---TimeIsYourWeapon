@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 75ada407bba6298c99fdcdbc69baedb3
+timeCreated: 1496978627
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_unique_buildings/castle_tower_octagon.prefab
+  uploadId: 723546

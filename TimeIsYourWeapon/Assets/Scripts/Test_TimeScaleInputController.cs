@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Test_TimeScaleInputController : MonoBehaviour
 {
-    public TimeScaleManager timeScaleManager;
+    public TimeManager timeManager;
 
     public float[] timeScaleValues = {0.0f, .25f, 0.5f, 1.0f, 1.25f};
     private float currentValue = 1.0f;
@@ -16,6 +17,20 @@ public class Test_TimeScaleInputController : MonoBehaviour
 
         currentValue = timeScaleValues[nextIndex];
         
-        timeScaleManager.ChangeTimescale(currentValue);
+        timeManager.ChangeTimeScale(currentValue);
+    }
+
+    void OnMove(InputValue value)
+    {
+        Vector2 input = value.Get<Vector2>();
+
+        if (input.y > 0.5f)
+        {
+            timeManager.AddSeconds(UnityEngine.Random.Range(1, 6));
+        }
+        else if (input.y < -0.5f)
+        {
+            timeManager.RemoveSeconds(UnityEngine.Random.Range(1, 6));
+        }
     }
 }

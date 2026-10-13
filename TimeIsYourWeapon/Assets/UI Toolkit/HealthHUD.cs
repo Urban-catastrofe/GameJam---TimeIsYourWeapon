@@ -72,4 +72,23 @@ public class HealthHUD : MonoBehaviour
         // after 1s they get DESTROYED
         floatingLabel.schedule.Execute( floatingLabel.RemoveFromHierarchy).StartingIn(1000);
     }
+    private void SpawnPositiveFloatingNumber(int amount)
+    // todo
+    {
+        string minuteNotation = TimeSpan.FromSeconds(amount).ToString(@"m\:ss");
+        var floatingLabel = new Label($"-{minuteNotation}");
+        floatingLabel.AddToClassList("damage-number");
+
+        Rect time = timeLabel.worldBound;
+        Vector2 local = floatLayer.WorldToLocal(new Vector2(time.center.x, time.yMin));
+        floatingLabel.style.left = local.x+ Random.Range(-30f, 30f);
+        floatingLabel.style.top = local.y - 20f - Random.Range(0f, 20f);
+
+        floatLayer.Add(floatingLabel);
+
+        // had to add slight delay 
+        floatingLabel.schedule.Execute(() => floatingLabel.AddToClassList("damage-number--float")).StartingIn(30);
+        // after 1s they get DESTROYED
+        floatingLabel.schedule.Execute( floatingLabel.RemoveFromHierarchy).StartingIn(1000);
+    }
 }

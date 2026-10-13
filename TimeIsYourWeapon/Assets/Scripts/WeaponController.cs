@@ -1,10 +1,13 @@
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 
+[RequireComponent(typeof(AudioSource))]
 public class WeaponController : MonoBehaviour
 {
+    private AudioSource shotSound;
+    private AudioClip shotSoundClip;
+    
     [Header("References")]
     [SerializeField] private Projectile projectilePrefab;
     [SerializeField] private Transform muzzle;
@@ -29,6 +32,18 @@ public class WeaponController : MonoBehaviour
 
     private void Awake()
     {
+        shotSound = GetComponent<AudioSource>();
+        if (shotSound == null)
+        {
+            shotSound = gameObject.AddComponent<AudioSource>();
+        }
+
+        shotSoundClip = Resources.Load<AudioClip>("Audio/PlayerShoot");
+        if (shotSoundClip == null)
+        {
+            Debug.LogWarning("[WeaponController] Kan 'PlayerShoot' niet vinden in de Resources-map!");
+        }
+
         currentAmmo = magazineSize;
     }
 
@@ -49,6 +64,11 @@ public class WeaponController : MonoBehaviour
 
     private void Fire()
     {
+        if (shotSound != null && shotSoundClip != null)
+        {
+            shotSound.PlayOneShot(shotSoundClip);
+        }
+        
         fireCooldown = 1f / fireRate;
         currentAmmo--;
         
@@ -65,11 +85,11 @@ public class WeaponController : MonoBehaviour
             aimRay.origin + aimRay.direction * aimRange;
 
         if (Physics.Raycast(
-            aimRay,
-            out RaycastHit aimHit,
-            aimRange,
-            aimLayers,
-            QueryTriggerInteraction.Ignore))
+                aimRay,
+                out RaycastHit aimHit,
+                aimRange,
+                aimLayers,
+                QueryTriggerInteraction.Ignore))
         {
             aimPoint = aimHit.point;
         }

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3a59e647dbec1ab02abd17139b728f07
+timeCreated: 1498470636
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_unique_buildings/port_wall_b.prefab
+  uploadId: 723546
