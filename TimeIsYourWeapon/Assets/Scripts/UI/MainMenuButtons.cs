@@ -61,8 +61,7 @@ namespace UI
 
         public void LoadCasinoScene()
         {
-            Debug.Log("Not implemented");
-            // SceneManager.LoadScene(casinoScene);
+            SceneManager.LoadScene(casinoScene);
         }
 
         public void LoadSettingsScene()
