@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3554225398615952828
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2868814140127890507}
+  m_Layer: 0
+  m_Name: Muzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2868814140127890507
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3554225398615952828}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.75, z: -5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8683055344305035641}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &4684997885210471896
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1967758284531576944, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 607805b266230624095ceb5a7e5ee453, type: 2}
+    - target: {fileID: 236216658851537685, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 607805b266230624095ceb5a7e5ee453, type: 2}
+    - target: {fileID: 919132149155446097, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      propertyPath: m_Name
+      value: cgtrader_optimized_Glock17
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -5078903600777333599, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2868814140127890507}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4387590971041247746}
+  m_SourcePrefab: {fileID: 100100000, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+--- !u!1 &5603917269200539785 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+  m_PrefabInstance: {fileID: 4684997885210471896}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4387590971041247746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5603917269200539785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac6fd1468e06ef54c8625667c48f0da2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponController
+  projectilePrefab: {fileID: 0}
+  muzzle: {fileID: 2868814140127890507}
+  playerCamera: {fileID: 0}
+  fireAction: {fileID: 1830069113069740138, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  fireRate: 4
+  magazineSize: 12
+  aimRange: 100
+  aimLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!4 &8683055344305035641 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5078903600777333599, guid: 62f4526338711ab4c98fda6f83b7d910, type: 3}
+  m_PrefabInstance: {fileID: 4684997885210471896}
+  m_PrefabAsset: {fileID: 0}
