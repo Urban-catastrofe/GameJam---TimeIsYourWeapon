@@ -51,6 +51,7 @@ public class LevelManager : MonoBehaviour
     
     public int AliveEnemies => enemies.Count;
     public int Kills => TotalEnemies - AliveEnemies;
+    public GameObject BossInstance => bossInstance;
     private float timeManager;
     private GameObject bossInstance;
 
