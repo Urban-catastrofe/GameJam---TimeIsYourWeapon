@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2f5066a9ad5212ac1a1628f13a5e1d5f
+timeCreated: 1496978566
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/well.prefab
+  uploadId: 723546

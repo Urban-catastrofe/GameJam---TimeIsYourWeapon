@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ca1e9ef4cc3010bbcbd408c5fbb9cd3e
+timeCreated: 1498477691
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/port_chains.prefab
+  uploadId: 723546

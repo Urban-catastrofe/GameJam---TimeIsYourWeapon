@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 10e46af0325ec6450b264955f0fd9ccf
+timeCreated: 1496978626
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_unique_buildings/castle_gate_a.prefab
+  uploadId: 723546

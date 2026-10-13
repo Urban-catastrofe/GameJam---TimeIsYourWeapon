@@ -8,35 +8,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
-    path: Assets/Scenes/BossArena.unity
-    guid: f6bd8951afee0698db616d701403df5d
-  - enabled: 1
-    path: Assets/Scenes/Casino.unity
-    guid: 038fabcd260c4fff81080fc362fd8eed
-  - enabled: 1
-    path: Assets/Scenes/Test scene Sybren.unity
-    guid: d7c6e04dae842184295427e1cbbfb1cc
-  - enabled: 1
-    path: Assets/Scenes/Level Select.unity
-    guid: 5dd427cea9e34a34980257154358383b
-  - enabled: 1
-    path: Assets/Scenes/Settings.unity
-    guid: 790d21e158baba5e281aff137a7645b4
-  - enabled: 1
-    path: Assets/Scenes/Test scene Cas.unity
-    guid: 067d1759a2080294fa2f24a190fbdb5e
-  - enabled: 1
-    path: Assets/Scenes/Test scene Nils.unity
-    guid: 8f94699df86635a48aa659ab62b8ace8
-  - enabled: 1
-    path: Assets/Scenes/Test scene Roald.unity
-    guid: e240b1a8ea5cef549925bcbf7215be22
-  - enabled: 1
-    path: Assets/Scenes/Test scene Simme.unity
-    guid: 28a0178245840494f9905fa60a24f776
-  - enabled: 1
-    path: Assets/Scenes/Test scene Stijn.unity
-    guid: ab200af551d27cc4ca9ff6adceb080c6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
