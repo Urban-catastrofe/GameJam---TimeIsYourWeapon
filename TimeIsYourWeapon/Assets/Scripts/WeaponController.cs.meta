@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: ac6fd1468e06ef54c8625667c48f0da2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - shotSound: {instanceID: 0}
+  - shotSoundClip: {fileID: 8300000, guid: 91cca87d7dc6b5c48b284cfc86185e70, type: 3}
+  - projectilePrefab: {instanceID: 0}
+  - muzzle: {instanceID: 0}
+  - playerCamera: {instanceID: 0}
+  - fireAction: {instanceID: 0}
+  - animator: {instanceID: 0}
+  - muzzleFlash: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

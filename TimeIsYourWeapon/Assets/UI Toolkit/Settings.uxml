@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Main%20Menu.uss?fileID=7433441132597879392&amp;guid=831e3bbb88545513fa31aac738c406bc&amp;type=3#Main Menu"/>
+    <ui:VisualElement name="Background" style="flex-grow: 1; align-self: auto; align-items: center; width: 100%; height: 100%; max-width: 100%; max-height: 100%; background-image: url(&quot;project://database/Assets/Images/Untitled.jpg?fileID=2800000&amp;guid=eb67d2299ce94021b88b17a1add9011d&amp;type=3#Untitled&quot;); justify-content: center; align-content: flex-end;">
+        <ui:VisualElement name="Container" style="flex-grow: 1; height: 90%; width: 50%; max-height: 90%; align-content: flex-start; justify-content: flex-start; align-self: center; background-image: none; -unity-background-image-tint-color: rgba(255, 255, 255, 0.788); background-color: rgba(128, 116, 86, 0.875); border-top-left-radius: 200px; border-top-right-radius: 200px; border-bottom-right-radius: 200px; border-bottom-left-radius: 200px; border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px; border-left-color: rgba(0, 0, 0, 0.741); border-right-color: rgba(0, 0, 0, 0.741); border-top-color: rgba(0, 0, 0, 0.741); border-bottom-color: rgba(0, 0, 0, 0.741); align-items: center;">
+            <ui:Label text="Settings" style="border-top-width: 30px; border-bottom-width: 30px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/UnifrakturCook-Bold.ttf?fileID=12800000&amp;guid=5ca6ec37a16b5f4b89fe9764304f9f11&amp;type=3#UnifrakturCook-Bold&quot;); font-size: 80px;"/>
+            <ui:VisualElement name="box" style="flex-grow: 1; height: 20%; max-height: 20%; align-self: center;">
+                <ui:Label text="Master Volume" style="font-size: 50px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Lato-Black.ttf?fileID=12800000&amp;guid=b309cbdf4805ecbe58f1bb919976487f&amp;type=3#Lato-Black&quot;);"/>
+                <ui:Slider label="" value="100" high-value="100" name="MasterAudioSlider" style="font-size: 30px; -unity-font-definition: url(&quot;project://database/Assets/Fonts/Lato-Black.ttf?fileID=12800000&amp;guid=b309cbdf4805ecbe58f1bb919976487f&amp;type=3#Lato-Black&quot;);"/>
+            </ui:VisualElement>
+            <ui:Button text="Return" name="ReturnButton" class="button" style="align-content: auto; bottom: -40%;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
