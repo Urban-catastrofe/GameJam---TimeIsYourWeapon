@@ -472,6 +472,9 @@ public class EnemyAI : MonoBehaviour
         anim.SetFloat("Speed", 0f);
         anim.SetTrigger("Die");
 
+        // Alleen voor de show, doet geen schade
+        Explosion.SpawnAt(gameObject);
+
         if (destroyAfter > 0f)
             Destroy(gameObject, destroyAfter);
 

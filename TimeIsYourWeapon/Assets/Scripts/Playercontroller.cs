@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour
     public float timeRemovedMin = 20f;
     public float timeRemovedMax = 30f;
 
+    [Header("Geraakt-explosie (alleen voor de show, doet geen schade)")]
+    public float hitExplosionDistance = 3f;    // hoe ver voor de camera de explosie verschijnt
+    public float hitExplosionScale = 0.5f;     // 1 = even groot als bij een dode enemy
+    public float hitShakeStrength = 0.7f;      // extra camera-shake bij een treffer
+
     // Voor het time-scale-script: 0 = staat stil, 1 = beweegt op volle snelheid.
     public float MoveAmount { get; private set; }
 
@@ -113,6 +118,18 @@ public class PlayerController : MonoBehaviour
     public void OnPlayerDamaged()
     {
         TimeManager.Instance.RemoveSeconds(Random.Range(timeRemovedMin, timeRemovedMax));
+        SpawnHitExplosion();
         OnPlayerHit?.Invoke();
+    }
+
+    // Explosie net voor de camera, zodat je hem ziet zonder dat je hele scherm vol vuur zit
+    void SpawnHitExplosion()
+    {
+        Transform view = cameraTransform != null ? cameraTransform : transform;
+        Vector3 forward = Vector3.ProjectOnPlane(view.forward, Vector3.up).normalized;
+        if (forward == Vector3.zero) forward = transform.forward;
+
+        Explosion.Spawn(view.position + forward * hitExplosionDistance, hitExplosionScale);
+        CameraShake.Shake(view.position, hitShakeStrength);
     }
 }
