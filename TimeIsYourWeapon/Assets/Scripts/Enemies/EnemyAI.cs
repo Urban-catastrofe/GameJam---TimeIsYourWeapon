@@ -380,9 +380,15 @@ public class EnemyAI : MonoBehaviour
     public void OnShootFrame()
     {
         if (state == State.Dead) return;
+
         recoil = 1f;
-        telegraphing = false;   // visor dooft na het schot
+        telegraphing = false;
         fireTimeout = -1f;
+
+        EnemyGunWeapon gun = GetComponent<EnemyGunWeapon>();
+
+        if (gun != null)
+            gun.Fire();
     }
 
     // Roep dit aan vanuit het kogelscript van de speler, met de collider die geraakt is.
