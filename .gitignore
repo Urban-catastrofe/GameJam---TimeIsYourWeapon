@@ -73,7 +73,6 @@ crashlytics-build.properties
 [Aa]ssets/AssetStoreTools*
 [Aa]ssets/Plugins/Editor/JetBrains*
 [Aa]ssets/Editor Default Resources/UnityCache/
-*.blob
 /TimeIsYourWeapon/UIElementsSchema
 /TimeIsYourWeapon/ProjectSettings
 /TimeIsYourWeapon/ProjectSettings

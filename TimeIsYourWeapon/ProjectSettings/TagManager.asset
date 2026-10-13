@@ -8,8 +8,6 @@ TagManager:
   - WeakPoint
   - PlayerSpawnPoint
   - EnemySpawnPoint
-  - EnemyBossSpawnPoint
-  - EnemyBoss
   layers:
   - Default
   - TransparentFX
