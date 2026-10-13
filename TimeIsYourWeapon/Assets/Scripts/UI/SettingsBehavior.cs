@@ -11,12 +11,13 @@ public class SettingsBehavior : MonoBehaviour
     private int _uiVersion = 0;
     private string buttonName = "ReturnButton";
     private string sliderName = "MasterAudioSlider";
+    private string mainVolume = "MainVolume"; 
     
     
     private void Awake()
     {
-            GetComponent<PanelRenderer>().RegisterUIReloadCallback(OnUIReload);
-        
+        GetComponent<PanelRenderer>().RegisterUIReloadCallback(OnUIReload);
+
     }
 
     private void OnDestroy()
@@ -32,6 +33,10 @@ public class SettingsBehavior : MonoBehaviour
             return;
         
         _uiVersion = version;
+        
+        // init it right place
+        mixer.GetFloat(mainVolume, out float dB);
+        root.Q<Slider>(sliderName).value = 100 - dB * 0.8f;
         
         root.Q<Button>(buttonName).clicked += LoadMainMenu;
         root.Q<Slider>(sliderName).RegisterCallback<ChangeEvent<float>>((evt) => { setVolume(evt.newValue); });
