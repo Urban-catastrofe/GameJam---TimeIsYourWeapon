@@ -3244,7 +3244,7 @@ MonoBehaviour:
   shuffleSpawnPoints: 1
   samePointSpread: 0.8
   enemyBossEnabled: 1
-  enemyBossPrefab: {fileID: 8813486830373274994, guid: d88ece13459904e1bb8a5367ea54f42b, type: 3}
+  enemyBossPrefab: {fileID: 7106333766582623398, guid: 5e5d08fb7df033643b9c809865d0ec98, type: 3}
   enemyBossReinforcement: 1
   enemyBossReinforcementDelay: 11.27
   amountOfReinforcementsMin: 2
