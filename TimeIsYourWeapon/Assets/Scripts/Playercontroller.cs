@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
         Vector3 move = transform.TransformDirection(input) * walkSpeed;
 
         MoveAmount = input.magnitude;
+        Debug.Log(MoveAmount);
 
         // ---- Zwaartekracht & springen ----
         if (controller.isGrounded && verticalVelocity < 0f)
@@ -92,7 +93,7 @@ public class PlayerController : MonoBehaviour
         Cursor.visible = !locked;
     }
 
-    public void OnBulletHit()
+    public void OnPlayerDamaged()
     {
         TimeManager.Instance.RemoveSeconds(Random.Range(timeRemovedMin, timeRemovedMax));
         OnPlayerHit?.Invoke();
