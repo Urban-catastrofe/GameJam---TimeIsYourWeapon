@@ -50,6 +50,11 @@ public class EnemyAI : MonoBehaviour
     public float recoilArm = 25f;
     public float recoilRecovery = 4f;
 
+    [Header("Health")]
+    public int maxHealth = 1;               // 1 = one hit KO (Grunt). Boss bijv. 10
+    public int bodyDamage = 1;              // schade per treffer op het lichaam
+    public int weakPointDamage = 3;         // schade per treffer op een collider met tag "WeakPoint"
+
     [Header("Dood")]
     public float destroyAfter = 5f;         // 0 = blijft liggen
 
@@ -75,7 +80,14 @@ public class EnemyAI : MonoBehaviour
     float fireTimeout = -1f;
     float glow;                             // 0 = normaal, 1 = volledig opgelicht
 
+    int currentHealth;
+
     public bool IsDead => state == State.Dead;
+    public int CurrentHealth => currentHealth;
+    public float HealthPercent => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f; // 0..1, handig voor de UI
+
+    // Wordt aangeroepen als de health verandert (voor de UI-klasgenoot): geeft HealthPercent door.
+    public event System.Action<float> OnHealthChanged;
 
     void Start()
     {
@@ -97,6 +109,8 @@ public class EnemyAI : MonoBehaviour
         }
         if (player != null) playerCollider = player.GetComponentInChildren<Collider>();
 
+        currentHealth = Mathf.Max(1, maxHealth);
+
         FindGlowMaterial();
         ReturnToCalm();
     }
@@ -106,7 +120,9 @@ public class EnemyAI : MonoBehaviour
         recoil = Mathf.Max(0f, recoil - recoilRecovery * Time.deltaTime);
 
         if (state == State.Dead) return;
-        if (Input.GetKeyDown(KeyCode.K)) { Die(); return; }
+        if (Input.GetKeyDown(KeyCode.K)) { Die(); return; }          // test: alles dood
+        if (Input.GetKeyDown(KeyCode.H)) { TakeDamage(bodyDamage); } // test: 1 treffer op het lichaam
+        if (state == State.Dead) return;
         if (player == null) return;
 
         canSee = CanSeePlayer();
@@ -350,12 +366,42 @@ public class EnemyAI : MonoBehaviour
         fireTimeout = -1f;
     }
 
-    // One hit KO: roep dit aan vanuit het kogelscript van de speler.
+    // Roep dit aan vanuit het kogelscript van de speler, met de collider die geraakt is.
+    // Raakt de kogel een collider met tag "WeakPoint", dan doet hij weakPointDamage, anders bodyDamage.
+    public void TakeHit(Collider hitCollider)
+    {
+        bool weak = hitCollider != null && hitCollider.CompareTag("WeakPoint");
+        TakeDamage(weak ? weakPointDamage : bodyDamage);
+    }
+
+    public void TakeDamage(int amount)
+    {
+        if (state == State.Dead || amount <= 0) return;
+
+        currentHealth = Mathf.Max(0, currentHealth - amount);
+        OnHealthChanged?.Invoke(HealthPercent);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+            return;
+        }
+
+        // Van achteren geraakt terwijl hij je nog niet zag? Dan weet hij nu waar je bent.
+        if (state == State.Idle || state == State.Patrol)
+            StartChase();
+    }
+
     public void Die()
     {
         if (state == State.Dead) return;
         state = State.Dead;
         recoil = 0f;
+        if (currentHealth != 0)
+        {
+            currentHealth = 0;
+            OnHealthChanged?.Invoke(0f);
+        }
         telegraphing = false;
 
         agent.isStopped = true;
