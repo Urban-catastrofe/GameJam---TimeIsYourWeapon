@@ -12,7 +12,12 @@ using UnityEngine.VFX;
 public class EnemyAI : MonoBehaviour
 {
     public enum State { Idle, Patrol, Chase, Attack, Dead }
-    public enum AttackMode { Ranged, Melee, Hybrid }
+
+    public enum AttackMode
+    {
+        Ranged,
+        Melee
+    }
 
     [Header("Status (alleen om mee te kijken tijdens Play)")]
     public State state = State.Idle;
@@ -43,8 +48,8 @@ public class EnemyAI : MonoBehaviour
     public float meleeRandomness = 0.3f;    // +/- willekeur op het interval
     [Range(0f, 360f)]
     public float meleeArc = 100f;           // de speler moet binnen deze hoek voor hem staan
-    public string slashTrigger = "Slash";   // Animator trigger voor de zwaardslag
-    public bool useAnimationEvent = false;  // true = schade komt van Animation Event OnSwordHit()
+    public string slashTrigger = "Shoot";   // Animator trigger voor de zwaardslag (zelfde als schieten)
+    public bool useAnimationEvent = true;   // true = schade komt van het Animation Event in de clip (OnShootFrame of OnSwordHit)
     public float meleeHitDelay = 0.35f;     // alleen als useAnimationEvent uit staat: vertraging tot de hit
     public AudioClip swordSwingSound;       // optioneel
     public AudioClip swordHitSound;         // optioneel
@@ -86,6 +91,8 @@ public class EnemyAI : MonoBehaviour
     Animator anim;
     Transform chest, rightUpperArm;
     Collider playerCollider;
+    float playerRadius = 0.4f;
+    readonly RaycastHit[] sightHits = new RaycastHit[16];
 
     bool canSee;
     float lastSeenTime;
@@ -129,15 +136,12 @@ public class EnemyAI : MonoBehaviour
             GameObject p = GameObject.FindGameObjectWithTag("Player");
             if (p != null) player = p.transform;
         }
-        if (player != null) playerCollider = player.GetComponentInChildren<Collider>();
-
-        foreach (AnimatorControllerParameter prm in anim.parameters)
-            if (prm.name == slashTrigger && prm.type == AnimatorControllerParameterType.Trigger)
-                hasSlashParam = true;
-
-        if (attackMode != AttackMode.Ranged && !hasSlashParam)
-            Debug.LogWarning("[EnemyAI] Animator op " + name + " heeft geen trigger '" + slashTrigger +
-                             "'. De zwaardslag doet nog steeds schade, maar speelt geen animatie.");
+        if (player != null)
+        {
+            playerCollider = player.GetComponentInChildren<Collider>();
+            if (playerCollider != null)
+                playerRadius = Mathf.Max(playerCollider.bounds.extents.x, playerCollider.bounds.extents.z);
+        }
 
         FindGlowMaterial();
         ReturnToCalm();
@@ -203,7 +207,7 @@ public class EnemyAI : MonoBehaviour
         agent.SetDestination(player.position);   // NavMesh zoekt zelf een weg om muren heen
 
         // Binnen bereik EN zichtlijn -> stoppen en aanvallen
-        if (canSee && FlatDistanceToPlayer() <= EffectiveAttackRange())
+        if (canSee && AttackDistance() <= EffectiveAttackRange())
         {
             state = State.Attack;
             shootTimer = Mathf.Max(reactionTime, telegraphTime);
@@ -223,7 +227,7 @@ public class EnemyAI : MonoBehaviour
 
         // Speler uit zicht of te ver weg (speling) -> weer achtervolgen
         float margin = attackMode == AttackMode.Melee ? 0.5f : 1f;
-        if (!canSee || FlatDistanceToPlayer() > EffectiveAttackRange() + margin)
+        if (!canSee || AttackDistance() > EffectiveAttackRange() + margin)
         {
             StartChase();
             return;
@@ -266,13 +270,27 @@ public class EnemyAI : MonoBehaviour
         return attackMode == AttackMode.Melee ? meleeRange : attackRange;
     }
 
+    // Afstand tussen de BUITENKANTEN van enemy en speler (niet middelpunt tot middelpunt).
+    // Zo werkt meleeRange ook voor een grote boss: zijn lichaam (agent.radius) botst eerder
+    // tegen de speler dan dat zijn middelpunt in de buurt komt.
+    float MeleeDistance()
+    {
+        float r = agent != null ? agent.radius : 0.5f;
+        return Mathf.Max(0f, FlatDistanceToPlayer() - r - playerRadius);
+    }
+
+    // Afstand die telt voor "ben ik dicht genoeg om aan te vallen?"
+    float AttackDistance()
+    {
+        return attackMode == AttackMode.Melee ? MeleeDistance() : FlatDistanceToPlayer();
+    }
+
     // Slaat hij nu met het zwaard of schiet hij?
     bool UseMelee()
     {
         switch (attackMode)
         {
             case AttackMode.Melee:  return true;
-            case AttackMode.Hybrid: return FlatDistanceToPlayer() <= meleeRange;
             default:                return false;
         }
     }
@@ -281,10 +299,11 @@ public class EnemyAI : MonoBehaviour
 
     void StartSwing()
     {
+        Debug.Log("StartSwing " +  hasSlashParam);
         swinging = true;
         swingTimer = useAnimationEvent ? -1f : meleeHitDelay;
 
-        if (hasSlashParam) anim.SetTrigger(slashTrigger);
+        anim.SetTrigger("Shoot");
         if (swordSwingSound != null)
             AudioSource.PlayClipAtPoint(swordSwingSound, transform.position);
     }
@@ -311,7 +330,7 @@ public class EnemyAI : MonoBehaviour
         // Raak ik de speler? Afstand, hoek en zichtlijn moeten kloppen op het raakmoment.
         Vector3 to = player.position - transform.position;
         to.y = 0f;
-        bool inReach = to.magnitude <= meleeRange + 0.75f;   // beetje speling voor een stap vooruit
+        bool inReach = MeleeDistance() <= meleeRange + 0.75f;   // beetje speling voor een stap vooruit
         bool inArc = Vector3.Angle(transform.forward, to) <= meleeArc * 0.5f;
 
         if (inReach && inArc && canSee)
@@ -470,10 +489,25 @@ public class EnemyAI : MonoBehaviour
         float dist = dir.magnitude;
         if (dist > detectRange) return false;
 
-        if (Physics.Raycast(from, dir / dist, out RaycastHit hit, dist + 0.5f, sightMask, QueryTriggerInteraction.Ignore))
-            return hit.transform == player || hit.transform.IsChildOf(player);
+        // Negeer de eigen colliders van de enemy: een grote boss heeft meerdere colliders
+        // (romp, armen, zwaard) die anders zijn eigen zichtlijn blokkeren.
+        int count = Physics.RaycastNonAlloc(from, dir / dist, sightHits, dist + 0.5f, sightMask, QueryTriggerInteraction.Ignore);
 
-        return true;
+        float closest = float.MaxValue;
+        Transform closestHit = null;
+        for (int i = 0; i < count; i++)
+        {
+            Transform t = sightHits[i].transform;
+            if (t == transform || t.IsChildOf(transform)) continue;   // eigen collider
+            if (sightHits[i].distance < closest)
+            {
+                closest = sightHits[i].distance;
+                closestHit = t;
+            }
+        }
+
+        if (closestHit == null) return true;
+        return closestHit == player || closestHit.IsChildOf(player);
     }
 
     // ---------- Schieten & dood ----------
@@ -483,6 +517,13 @@ public class EnemyAI : MonoBehaviour
     {
         if (state == State.Dead)
             return;
+
+        // Zelfde clip/event voor schieten en zwaardslag: bij een slag geen kogel maar een zwaardhit.
+        if (swinging)
+        {
+            OnSwordHit();
+            return;
+        }
 
         recoil = 1f;
         telegraphing = false;
@@ -554,11 +595,13 @@ public class EnemyAI : MonoBehaviour
         if (attackMode != AttackMode.Ranged)
         {
             Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(pos, meleeRange);
+            NavMeshAgent a = GetComponent<NavMeshAgent>();
+            float reach = meleeRange + (a != null ? a.radius : 0f);   // vanaf het middelpunt gemeten
+            Gizmos.DrawWireSphere(pos, reach);
             Vector3 mLeft = Quaternion.Euler(0f, -meleeArc * 0.5f, 0f) * transform.forward;
             Vector3 mRight = Quaternion.Euler(0f, meleeArc * 0.5f, 0f) * transform.forward;
-            Gizmos.DrawLine(pos, pos + mLeft * meleeRange);
-            Gizmos.DrawLine(pos, pos + mRight * meleeRange);
+            Gizmos.DrawLine(pos, pos + mLeft * reach);
+            Gizmos.DrawLine(pos, pos + mRight * reach);
         }
 
         if (Application.isPlaying && player != null && eye != null)
