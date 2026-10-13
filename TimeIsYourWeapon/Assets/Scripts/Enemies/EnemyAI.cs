@@ -96,6 +96,7 @@ public class EnemyAI : MonoBehaviour
     // --- AUDIO VARIABELEN ---
     [Header("Audio")]
     public float timeBetweenSteps = 0.35f;  
+    public float maxFootstepDistance = 2f; // TOEGEVOEGD: Hoe dichtbij moet hij zijn om gehoord te worden?
     private float stepTimer = 0f;
     private AudioClip shootSoundClip; 
     private AudioClip[] footstepSounds = new AudioClip[6];
@@ -148,8 +149,16 @@ public class EnemyAI : MonoBehaviour
         
         // --- AUDIO INLADEN ---
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        if (audioSource == null) 
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
         
+        // Zorg dat het geluid ALTIJD in 3D is (anders klinkt het overal even hard)
+        audioSource.spatialBlend = 1f; 
+        audioSource.rolloffMode = AudioRolloffMode.Linear;
+        audioSource.maxDistance = maxFootstepDistance;
+
         shootSoundClip = Resources.Load<AudioClip>("Audio/EnemyShoot");
         for (int i = 0; i < 6; i++)
         {
@@ -216,7 +225,12 @@ public class EnemyAI : MonoBehaviour
             stepTimer -= Time.deltaTime;
             if (stepTimer <= 0f)
             {
-                PlayFootstep();
+                // TOEGEVOEGD: Speel het geluid ALLEEN af als hij binnen de max afstand is
+                if (player != null && Vector3.Distance(transform.position, player.position) <= maxFootstepDistance)
+                {
+                    PlayFootstep();
+                }
+                
                 stepTimer = timeBetweenSteps; 
             }
         }
@@ -457,8 +471,6 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
-        Debug.LogWarning("[EnemyAI] Geen materiaal met de naam '" + glowMaterialName +
-                         "' gevonden op " + name + ". Telegraphing is uitgeschakeld.");
     }
 
     void StartTelegraph()
