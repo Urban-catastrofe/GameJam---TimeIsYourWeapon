@@ -1781,7 +1781,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   playerSpawnTag: PlayerSpawnPoint
   enemySpawnTag: EnemySpawnPoint
-  playerPrefab: {fileID: 0}
+  playerPrefab: {fileID: 5181673568841404214, guid: 4f8b7dc5f5116bcf195261df8204b560, type: 3}
   teleportExistingPlayer: 1
   enemyPrefab: {fileID: 5181673568841404214, guid: 4f8b7dc5f5116bcf195261df8204b560, type: 3}
   enemyCount: 5
