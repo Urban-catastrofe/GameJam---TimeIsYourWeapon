@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Menu.uss?fileID=7433441132597879392&amp;guid=831e3bbb88545513fa31aac738c406bc&amp;type=3#Menu"/>
+    <Style src="project://database/Assets/UI%20Toolkit/GameOverScreen.uss?fileID=7433441132597879392&amp;guid=73c2daaeb45e49e88fbdcc5baecb210d&amp;type=3#GameOverScreen"/>
+    <ui:VisualElement name="GameOverRoot" class="game-over-root">
+        <ui:VisualElement name="GameOverPanel" class="game-over-panel">
+            <ui:Label text="Time's Up" name="GameOverTitle" class="game-over-title"/>
+            <ui:Label text="Enemies killed: 0 / 0" name="GameOverStats" class="game-over-stats"/>
+            <ui:Button text="Main Menu" name="MainMenuButton" class="button game-over-button"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

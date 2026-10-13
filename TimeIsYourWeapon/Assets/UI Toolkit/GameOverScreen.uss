@@ -1,0 +1,51 @@
+.game-over-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.game-over-root.is-visible {
+    display: flex;
+}
+
+.game-over-panel {
+    width: 40%;
+    min-width: 420px;
+    align-items: center;
+
+    padding: 32px 24px;
+
+    background-color: rgba(15, 24, 40, 0.94);
+    border-width: 2px;
+    border-color: rgb(170, 60, 73);
+    border-radius: 12px;
+}
+
+.game-over-title {
+    -unity-font-definition: url("project://database/Assets/Fonts/UnifrakturCook-Bold.ttf?fileID=12800000&guid=5ca6ec37a16b5f4b89fe9764304f9f11&type=3#UnifrakturCook-Bold");
+    font-size: 96px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(255, 65, 80);
+}
+
+.game-over-stats {
+    font-size: 24px;
+    -unity-text-align: middle-center;
+    color: rgb(230, 230, 230);
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.game-over-button {
+    width: 80%;
+    -unity-text-align: middle-center;
+}

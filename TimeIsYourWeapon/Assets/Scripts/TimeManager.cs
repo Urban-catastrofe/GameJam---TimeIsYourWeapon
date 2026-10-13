@@ -12,7 +12,7 @@ public class TimeManager : MonoBehaviour
     public static event Action<float> OnTimeScaleChange;
     public static event Action<float> OnTimeRemainingChange;
     public static event Action<float> OnTimerModified;
-    public static event Action OnTimerEnded; // TODO go to end screen when triggered
+    public static event Action OnTimerEnded;
 
     #endregion
     
