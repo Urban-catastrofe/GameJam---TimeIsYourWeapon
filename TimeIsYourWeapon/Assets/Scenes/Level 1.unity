@@ -1138,6 +1138,8 @@ Transform:
   - {fileID: 527449130}
   - {fileID: 931481192}
   - {fileID: 461057485}
+  - {fileID: 1417084168}
+  - {fileID: 1372087312}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1141675798
@@ -1526,6 +1528,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4148390154443938, guid: c5042e1d4f5ffbe4c8df6e094869f4c2, type: 3}
   m_PrefabInstance: {fileID: 1224637435}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1372087311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1372087312}
+  m_Layer: 0
+  m_Name: EnemySpawpoint (4)
+  m_TagString: EnemySpawnPoint
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1372087312
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372087311}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -46.75, y: 0, z: 2.98}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1045552076}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1385158807
 GameObject:
   m_ObjectHideFlags: 0
@@ -1574,6 +1607,37 @@ Transform:
   - {fileID: 1670970779}
   - {fileID: 1198006917}
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1417084167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1417084168}
+  m_Layer: 0
+  m_Name: EnemySpawpoint (3)
+  m_TagString: EnemySpawnPoint
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1417084168
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417084167}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -61, y: 0, z: 2.98}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1045552076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1472487907
 PrefabInstance:
@@ -1859,10 +1923,10 @@ MonoBehaviour:
   playerSpawnTag: PlayerSpawnPoint
   enemySpawnTag: EnemySpawnPoint
   enemyBossSpawnTag: EnemyBossSpawnPoint
-  playerPrefab: {fileID: 7969857883145398153, guid: f86a2db541b810976b2cf93d0dd618af, type: 3}
+  playerPrefab: {fileID: 991824196741141056, guid: 8e2675cf30a2785608815973f78211f0, type: 3}
   teleportExistingPlayer: 1
-  enemyPrefab: {fileID: 5181673568841404214, guid: 4f8b7dc5f5116bcf195261df8204b560, type: 3}
-  enemyCount: 5
+  enemyPrefab: {fileID: 3992380787364986185, guid: 7fd451fa43292524da5f97b0eceedeb0, type: 3}
+  enemyCount: 12
   shuffleSpawnPoints: 0
   samePointSpread: 0.8
   enemyBossEnabled: 0
