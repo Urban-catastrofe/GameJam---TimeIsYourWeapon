@@ -6,7 +6,10 @@ public class TimeManager : MonoBehaviour
 {
     public float secondsRemaining = 120f;
     public float durationKilledState = 3.0f;
-    public float timeScaleKilledModifier = 0.2f;
+    public float timeScaleStandingModifier = 0.25f;
+    public float timeScaleMovingModifier = 1.0f;
+    public float timeScaleRotatingModifier = 0.5f;
+    public float timeScaleKilledModifier = 0.1f;
     #region Events
 
     public static event Action<float> OnTimeScaleChange;
@@ -79,13 +82,13 @@ public class TimeManager : MonoBehaviour
         switch (state)
         {
             case TimeScaleState.Standing:
-                ChangeTimeScale(0);
+                ChangeTimeScale(timeScaleStandingModifier);
                 break;
             case TimeScaleState.Moving:
-                ChangeTimeScale(1.0f);
+                ChangeTimeScale(timeScaleMovingModifier);
                 break;
             case TimeScaleState.Rotating:
-                ChangeTimeScale(0.5f);
+                ChangeTimeScale(timeScaleRotatingModifier);
                 break;
             case TimeScaleState.Killed:
                 ChangeTimeScale(timeScaleKilledModifier);
@@ -100,7 +103,7 @@ public class TimeManager : MonoBehaviour
     {
         yield return new WaitForSeconds(durationKilledState * timeScaleKilledModifier);
         state = TimeScaleState.Moving;
-        ChangeTimeScale(1.0f);
+        ChangeTimeScale(timeScaleMovingModifier);
     }
 
     public enum TimeScaleState
