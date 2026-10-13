@@ -1,0 +1,77 @@
+.crosshair-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.crosshair {
+    width: 32px;
+    height: 32px;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.crosshair-line {
+    position: absolute;
+
+    background-color: rgb(245, 248, 255);
+}
+
+/* Horizontal arms: 10px long, 2px thick, 6px gap from center */
+.crosshair-line--left,
+.crosshair-line--right {
+    top: 15px;
+    width: 10px;
+    height: 2px;
+}
+
+.crosshair-line--left {
+    left: 0;
+}
+
+.crosshair-line--right {
+    right: 0;
+}
+
+/* Vertical arms */
+.crosshair-line--top,
+.crosshair-line--bottom {
+    left: 15px;
+    width: 2px;
+    height: 10px;
+}
+
+.crosshair-line--top {
+    top: 0;
+}
+
+.crosshair-line--bottom {
+    bottom: 0;
+}
+
+.crosshair-dot {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 4px;
+    height: 4px;
+
+    background-color: rgb(245, 248, 255);
+    border-radius: 2px;
+}
+
+/* Optional state, toggle from code (e.g. when aiming at an enemy) */
+.crosshair.is-targeting .crosshair-line,
+.crosshair.is-targeting .crosshair-dot {
+    background-color: rgb(255, 65, 80);
+}
+
+.crosshair.is-hidden {
+    display: none;
+}
