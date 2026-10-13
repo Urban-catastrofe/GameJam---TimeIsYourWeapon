@@ -1,0 +1,120 @@
+.hud-root {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+
+    width: auto;
+    height: auto;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    align-items: flex-end;
+}
+
+.timer-panel {
+    width: auto;
+    height: auto;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+    align-self: flex-end;
+
+    padding: 8px 16px;
+
+    background-color: rgba(15, 24, 40, 0.94);
+    border-width: 2px;
+    border-color: rgb(73, 119, 170);
+    border-radius: 12px;
+}
+
+.timer-label {
+    color: rgb(245, 248, 255);
+    font-size: 36px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin: 0;
+}
+
+.penalty-label {
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+
+    font-size: 23px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+
+    opacity: 0;
+    translate: 0px 0px;
+
+    transition-property: opacity, translate;
+    transition-duration: 650ms;
+    transition-timing-function: ease-out;
+}
+
+.penalty-label.is-visible {
+    opacity: 1;
+    translate: 0px -42px;
+}
+
+.time-scale-label {
+    align-self: flex-start;
+    margin-top: 4px;
+    margin-left: 4px;
+
+    color: rgb(155, 174, 198);
+    font-size: 16px;
+    -unity-text-align: middle-left;
+}
+
+/*.penalty-label {*/
+/*    position: absolute;*/
+
+/*    top: -4px;*/
+/*    left: 0;*/
+/*    right: 0;*/
+
+/*    color: rgb(255, 65, 80);*/
+
+/*    font-size: 23px;*/
+/*    -unity-font-style: bold;*/
+/*    -unity-text-align: middle-center;*/
+
+/*    opacity: 0;*/
+
+/*    translate: 0px 0px;*/
+
+/*    transition-property: opacity, translate;*/
+/*    transition-duration: 650ms;*/
+/*    transition-timing-function: ease-out;*/
+/*}*/
+
+.penalty-label {
+    color: rgb(255, 65, 80);
+    font-size: 32px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+
+    position: absolute;
+    white-space: nowrap;
+
+    transition-property: translate, opacity;
+    transition-duration: 2000ms;
+    transition-timing-function: ease-out;
+}
+
+.penalty-label.is-visible {
+    opacity: 1;
+    translate: 0px -68px;
+}
+
+.time-scale-label {
+    margin-top: 6px;
+
+    color: rgb(155, 174, 198);
+
+    font-size: 12px;
+    -unity-text-align: middle-center;
+}
