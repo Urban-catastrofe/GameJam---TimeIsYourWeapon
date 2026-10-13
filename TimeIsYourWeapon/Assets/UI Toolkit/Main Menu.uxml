@@ -1,0 +1,8 @@
+<UXML xmlns="UnityEngine.UIElements">
+    <Style src="HUD.uss" />
+
+    <VisualElement name="root" class="root">
+        <Label name="hp-label" text="HP: 100" class="hp-label" />
+        <VisualElement name="float-layer" class="float-layer" picking-mode="Ignore" />
+    </VisualElement>
+</UXML>
