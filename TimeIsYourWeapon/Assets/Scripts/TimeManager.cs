@@ -10,6 +10,7 @@ public class TimeManager : MonoBehaviour
     public static event Action<float> OnTimeScaleChange;
     public static event Action<float> OnTimeRemainingChange;
     public static event Action<float> OnTimerModified;
+    public static event Action OnTimerEnded; // TODO go to end screen when triggered
 
     #endregion
     
@@ -37,6 +38,8 @@ public class TimeManager : MonoBehaviour
             secondsRemaining -= 0.1f;
             OnTimeRemainingChange?.Invoke(secondsRemaining);
         }
+        
+        OnTimerModified?.Invoke(secondsRemaining);
     }
 
     public void AddSeconds(float seconds)
