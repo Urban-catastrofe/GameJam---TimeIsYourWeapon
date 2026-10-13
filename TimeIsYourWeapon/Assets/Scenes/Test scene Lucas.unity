@@ -286,10 +286,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fc954887a9751e22a2ad283387e04b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonBehavior
-  gameScene: level
-  levelSelectScene: LevelSelect
-  settingsScene: settings
-  casinoScene: casino
 --- !u!1931382934 &1436559812
 PanelRenderer:
   m_ObjectHideFlags: 0

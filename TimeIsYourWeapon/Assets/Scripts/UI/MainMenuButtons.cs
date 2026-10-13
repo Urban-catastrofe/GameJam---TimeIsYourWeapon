@@ -7,9 +7,9 @@ namespace UI
     public class MainMenuButtons : MonoBehaviour
     {
         private VisualElement _root;
-        public string gameScene = "level";
-        public string settingsScene = "settings";
-        public string casinoScene = "casino";
+        private string levelSelectScene = "Level Select";
+        private string settingsScene = "Settings";
+        private string casinoScene = "Casino";
         private int _uiVersion = 0;
         
         void Awake()
@@ -55,8 +55,7 @@ namespace UI
         
         public void LoadGameScene()
         {
-            Debug.Log("Not implemented");
-            // SceneManager.LoadScene(gameScene);
+            SceneManager.LoadScene(levelSelectScene);
         }
 
         public void LoadCasinoScene()
@@ -66,8 +65,7 @@ namespace UI
 
         public void LoadSettingsScene()
         {
-            Debug.Log("Not implemented");
-            // SceneManager.LoadScene(settingsScene);
+            SceneManager.LoadScene(settingsScene);
         }
 
         public void ExitGame()
