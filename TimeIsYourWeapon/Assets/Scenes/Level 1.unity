@@ -1712,6 +1712,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeManager
   secondsRemaining: 120
+  durationKilledState: 3
+  timeScaleKilledModifier: 0.2
 --- !u!1001 &1670970778
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1947,10 +1949,15 @@ MonoBehaviour:
   amountOfReinforcementsMin: 1
   amountOfReinforcementsMax: 5
   autoStart: 1
+  playerData: {fileID: 11400000, guid: c1215df3aa4e071abafb4f33e0233416, type: 2}
+  menuSceneName: MainScene
   onLevelStart:
     m_PersistentCalls:
       m_Calls: []
   onLevelComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  onLevelFailed:
     m_PersistentCalls:
       m_Calls: []
   onEnemyCountChanged:
