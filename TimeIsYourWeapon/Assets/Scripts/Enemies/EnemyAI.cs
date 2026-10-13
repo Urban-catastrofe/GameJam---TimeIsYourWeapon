@@ -8,6 +8,7 @@ using UnityEngine.VFX;
 // - Telegraphing: de visor licht op vlak voor elk schot (en elke zwaardslag).
 // - Attack modes: Ranged (schieten), Melee (zwaard) of Hybrid (schieten, maar zwaard als de speler dichtbij komt).
 // - One hit KO: roep Die() aan vanuit het kogelscript.   Testtoets: K = alle enemies dood.
+[RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
 {
@@ -72,6 +73,11 @@ public class EnemyAI : MonoBehaviour
     public float recoilArm = 25f;
     public float recoilRecovery = 4f;
 
+    [Header("Health")]
+    public int maxHealth = 1;               // 1 = one hit KO (Grunt). Boss bijv. 10
+    public int bodyDamage = 1;              // schade per treffer op het lichaam
+    public int weakPointDamage = 3;         // schade per treffer op een collider met tag "WeakPoint"
+
     [Header("Dood")]
     public float destroyAfter = 5f;         // 0 = blijft liggen
     
@@ -86,6 +92,15 @@ public class EnemyAI : MonoBehaviour
     [Header("Weapon Effects")]
     [SerializeField] private VisualEffect muzzleFlash;
     [SerializeField] private string muzzleFlashEvent = "Shoot";
+
+    // --- AUDIO VARIABELEN ---
+    [Header("Audio")]
+    public float timeBetweenSteps = 0.35f;  
+    private float stepTimer = 0f;
+    private AudioClip shootSoundClip; 
+    private AudioClip[] footstepSounds = new AudioClip[6];
+    private AudioSource audioSource;
+    // ------------------------
 
     NavMeshAgent agent;
     Animator anim;
@@ -116,13 +131,31 @@ public class EnemyAI : MonoBehaviour
     float fireTimeout = -1f;
     float glow;                             // 0 = normaal, 1 = volledig opgelicht
 
+    int currentHealth;
+
     public bool IsDead => state == State.Dead;
+    public int CurrentHealth => currentHealth;
+    public float HealthPercent => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f; // 0..1, handig voor de UI
+
+    // Wordt aangeroepen als de health verandert (voor de UI-klasgenoot): geeft HealthPercent door.
+    public event System.Action<float> OnHealthChanged;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponentInChildren<Animator>();
         agent.stoppingDistance = 0.3f;
+        
+        // --- AUDIO INLADEN ---
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        
+        shootSoundClip = Resources.Load<AudioClip>("Audio/EnemyShoot");
+        for (int i = 0; i < 6; i++)
+        {
+            footstepSounds[i] = Resources.Load<AudioClip>("Audio/Footstep" + (i + 1));
+        }
+        // ---------------------
 
         if (eye == null) eye = anim.GetBoneTransform(HumanBodyBones.Head);
         if (eye == null) eye = transform;
@@ -143,6 +176,8 @@ public class EnemyAI : MonoBehaviour
                 playerRadius = Mathf.Max(playerCollider.bounds.extents.x, playerCollider.bounds.extents.z);
         }
 
+        currentHealth = Mathf.Max(1, maxHealth);
+
         FindGlowMaterial();
         ReturnToCalm();
     }
@@ -152,7 +187,9 @@ public class EnemyAI : MonoBehaviour
         recoil = Mathf.Max(0f, recoil - recoilRecovery * Time.deltaTime);
 
         if (state == State.Dead) return;
-        if (Input.GetKeyDown(KeyCode.K)) { Die(); return; }
+        if (Input.GetKeyDown(KeyCode.K)) { Die(); return; }          // test: alles dood
+        if (Input.GetKeyDown(KeyCode.H)) { TakeDamage(bodyDamage); } // test: 1 treffer op het lichaam
+        if (state == State.Dead) return;
         if (player == null) return;
 
         canSee = CanSeePlayer();
@@ -172,6 +209,22 @@ public class EnemyAI : MonoBehaviour
 
         anim.SetFloat("Speed", agent.velocity.magnitude);
         UpdateGlow();
+        
+        // --- VOETSTAPPEN (PUUR CODE) ---
+        if (agent.velocity.magnitude > 0.1f)
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f)
+            {
+                PlayFootstep();
+                stepTimer = timeBetweenSteps; 
+            }
+        }
+        else
+        {
+            stepTimer = 0f; 
+        }
+        // -------------------------------
     }
 
     // ---------- States ----------
@@ -532,12 +585,42 @@ public class EnemyAI : MonoBehaviour
         FireProjectile();
     }
 
-    // One hit KO: roep dit aan vanuit het kogelscript van de speler.
+    // Roep dit aan vanuit het kogelscript van de speler, met de collider die geraakt is.
+    // Raakt de kogel een collider met tag "WeakPoint", dan doet hij weakPointDamage, anders bodyDamage.
+    public void TakeHit(Collider hitCollider)
+    {
+        bool weak = hitCollider != null && hitCollider.CompareTag("WeakPoint");
+        TakeDamage(weak ? weakPointDamage : bodyDamage);
+    }
+
+    public void TakeDamage(int amount)
+    {
+        if (state == State.Dead || amount <= 0) return;
+
+        currentHealth = Mathf.Max(0, currentHealth - amount);
+        OnHealthChanged?.Invoke(HealthPercent);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+            return;
+        }
+
+        // Van achteren geraakt terwijl hij je nog niet zag? Dan weet hij nu waar je bent.
+        if (state == State.Idle || state == State.Patrol)
+            StartChase();
+    }
+
     public void Die()
     {
         if (state == State.Dead) return;
         state = State.Dead;
         recoil = 0f;
+        if (currentHealth != 0)
+        {
+            currentHealth = 0;
+            OnHealthChanged?.Invoke(0f);
+        }
         telegraphing = false;
         swinging = false;
         swingTimer = -1f;
@@ -620,6 +703,14 @@ public class EnemyAI : MonoBehaviour
                 this);
             return;
         }
+        
+        // --- AUDIO SCHIETEN ---
+        if (audioSource != null && shootSoundClip != null)
+        {
+            audioSource.pitch = 1f; 
+            audioSource.PlayOneShot(shootSoundClip);
+        }
+        // ----------------------
 
         // Aim towards the player's collider centre.
         Vector3 targetPosition = PlayerAimPoint();
@@ -660,5 +751,21 @@ public class EnemyAI : MonoBehaviour
             projectileSpeed,
             projectileDamage,
             projectileLifetime);
+    }
+
+    // --- AUDIO HULPFUNCTIE ---
+    private void PlayFootstep()
+    {
+        if (footstepSounds != null && footstepSounds.Length > 0 && audioSource != null)
+        {
+            int randomIndex = Random.Range(0, footstepSounds.Length);
+            AudioClip clip = footstepSounds[randomIndex];
+
+            if (clip != null)
+            {
+                audioSource.pitch = Random.Range(0.85f, 1.15f); 
+                audioSource.PlayOneShot(clip, 0.4f); 
+            }
+        }
     }
 }
