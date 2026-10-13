@@ -215,7 +215,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 58687072eefec0f23981df7795b6ce1c, type: 3}
       propertyPath: m_TagString
-      value: EnemyBoss
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 1082271958561512970, guid: 58687072eefec0f23981df7795b6ce1c, type: 3}
       propertyPath: m_Layer
@@ -379,12 +379,7 @@ MonoBehaviour:
   recoilChest: 12
   recoilArm: 25
   recoilRecovery: 4
-  maxHealth: 3
+  maxHealth: 10
   bodyDamage: 1
   weakPointDamage: 3
-  playHitAnimation: 1
-  hitStunTime: 0.6
-  hitCooldown: 1.5
-  interruptAttack: 0
-  attackStateName: Shooting
   destroyAfter: 5
