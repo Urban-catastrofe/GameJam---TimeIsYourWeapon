@@ -1,8 +1,11 @@
-<UXML xmlns="UnityEngine.UIElements">
-    <Style src="HUD.uss" />
-
-    <VisualElement name="root" class="root">
-        <Label name="hp-label" text="HP: 100" class="hp-label" />
-        <VisualElement name="float-layer" class="float-layer" picking-mode="Ignore" />
+<UXML xmlns="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Main%20Menu.uss?fileID=7433441132597879392&amp;guid=831e3bbb88545513fa31aac738c406bc&amp;type=3#Main Menu"/>
+    <VisualElement name="Backgound" style="flex-grow: 1; justify-content: flex-end; align-self: auto; max-width: 100%; max-height: 100%; width: 100%; height: 100%; background-image: url(&quot;project://database/Assets/Images/Untitled.jpg?fileID=2800000&amp;guid=eb67d2299ce94021b88b17a1add9011d&amp;type=3#Untitled&quot;);">
+        <VisualElement name="ButtonContainer" style="flex-grow: 1; max-width: 40%; width: 40%; max-height: 60%; height: 60%; align-self: center; justify-content: center;">
+            <Button text="Start Game" name="StartButton" class="button"/>
+            <Button text="Casino" name="CasinoButton" class="button"/>
+            <Button text="Settings" name="SettingsButton" class="button"/>
+            <Button text="Quit" name="QuitButton" class="button"/>
+        </VisualElement>
     </VisualElement>
 </UXML>

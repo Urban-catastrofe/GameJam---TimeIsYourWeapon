@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 990b990c8d6f2557dbc0423056ec7a8b
+timeCreated: 1498383337
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_unique_buildings/port_wall_corner_c.prefab
+  uploadId: 723546
