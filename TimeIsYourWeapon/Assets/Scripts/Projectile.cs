@@ -94,7 +94,7 @@ public class Projectile : MonoBehaviour
         }
         else if (pc != null)
         {
-            pc.OnBulletHit();
+            pc.OnPlayerDamaged();
         }
         else
         {
