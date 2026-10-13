@@ -102,7 +102,11 @@ public class EnemyDemo : MonoBehaviour
         anim.SetTrigger("Die");
 
         if (destroyAfter > 0f)
-            Destroy(gameObject, destroyAfter);
+        {
+            if (LevelManager.Instance != null) LevelManager.Instance.NotifyEnemyKilled(gameObject);
+            Destroy(gameObject, 3f);
+            
+        }
     }
 
     // LateUpdate draait NA de animatie, dus deze rotaties komen bovenop de animatie.
