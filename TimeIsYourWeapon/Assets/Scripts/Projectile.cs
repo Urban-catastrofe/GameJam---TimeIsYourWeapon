@@ -83,12 +83,18 @@ public class Projectile : MonoBehaviour
 
     private void HandleHit(RaycastHit hit)
     {
+        Debug.Log("Hit " + hit.collider.gameObject.name);
         // Support colliders placed on child objects of an enemy.
         EnemyAI enemy = hit.collider.GetComponentInParent<EnemyAI>();
+        PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
 
         if (enemy != null && !enemy.IsDead)
         {
             enemy.TakeHit(hit.collider);
+        }
+        else if (pc != null)
+        {
+            pc.OnBulletHit();
         }
         else
         {

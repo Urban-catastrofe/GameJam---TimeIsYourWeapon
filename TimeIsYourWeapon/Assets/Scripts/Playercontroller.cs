@@ -1,4 +1,7 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 // Simpele first-person speler: WASD lopen, muis kijken, spatie springen.
 // Zet dit op de Player (met een CharacterController) en de Main Camera als kind op ooghoogte.
@@ -19,6 +22,8 @@ public class PlayerController : MonoBehaviour
     [Header("Tijd")]
     [Tooltip("Aan: de speler beweegt op normale snelheid, ook als de tijd vertraagd is (Superhot-gevoel).")]
     public bool ignoreTimeScale = true;
+    public float timeRemovedMin = 20f;
+    public float timeRemovedMax = 30f;
 
     // Voor het time-scale-script: 0 = staat stil, 1 = beweegt op volle snelheid.
     public float MoveAmount { get; private set; }
@@ -26,6 +31,8 @@ public class PlayerController : MonoBehaviour
     CharacterController controller;
     float pitch;
     float verticalVelocity;
+
+    public static event Action OnPlayerHit;
 
     void Start()
     {
@@ -83,5 +90,11 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !locked;
+    }
+
+    public void OnBulletHit()
+    {
+        TimeManager.Instance.RemoveSeconds(Random.Range(timeRemovedMin, timeRemovedMax));
+        OnPlayerHit?.Invoke();
     }
 }
