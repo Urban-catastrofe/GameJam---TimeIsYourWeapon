@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="project://database/Assets/UI%20Toolkit/HUD.uss?fileID=7433441132597879392&amp;guid=74f55ac0fd0b65371a4bb9a4c4988b16&amp;type=3#HUD"/>
-    <ui:VisualElement name="root" class="root">
-        <ui:Label name="time-label" text="place:holder" class="time-label" style="bottom: 64px;"/>
-        <ui:VisualElement name="float-layer" picking-mode="Ignore" class="float-layer"/>
-    </ui:VisualElement>
-</ui:UXML>
