@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8febaab52997fcbd4b24fd29be9e0106
+timeCreated: 1496978806
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_civilian_buildings/standard_rooftop_window.prefab
+  uploadId: 723546

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e167d69fc0ccf569c85b94154314ac57
+timeCreated: 1498656956
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 94557
+  packageName: Polylised - Medieval Desert City
+  packageVersion: 1.0
+  assetPath: Assets/Polylised - Medieval Desert City/Prefabs/prefab_props/barrel.prefab
+  uploadId: 723546

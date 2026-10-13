@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.VFX;
 
 [RequireComponent(typeof(AudioSource))]
+// Enemy-AI met states: Idle/Patrol -> Chase -> Attack -> Dead.
+// - Ziet de speler alleen binnen detectRange, binnen zijn kijkhoek en met vrije zichtlijn.
+// - Volgt de speler tot attackRange en schiet alleen als hij de speler echt kan zien.
+// - Telegraphing: de visor licht op vlak voor elk schot.
+// - Health: kogels roepen TakeHit(collider) aan (zie BulletDamage.cs). Max Health 1 = one hit KO.
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyAI : MonoBehaviour
 {
     public enum State { Idle, Patrol, Chase, Attack, Dead }
     public enum AttackMode { Ranged, Melee }
+
 
     [Header("Status (alleen om mee te kijken tijdens Play)")]
     public State state = State.Idle;
@@ -43,6 +48,12 @@ public class EnemyAI : MonoBehaviour
     public float meleeHitDelay = 0.35f;
     public AudioClip swordHitSound;
 
+    public float attackRange = 8f;          // afstand waarop hij stopt en gaat schieten
+    public float shootInterval = 3.5f;      // seconden tussen schoten
+    public float shootRandomness = 0.5f;    // +/- willekeur op het interval
+    public float reactionTime = 0.6f;       // wachttijd voor het eerste schot
+    public float turnSpeed = 8f;            // hoe snel hij naar de speler draait
+
     [Header("Telegraphing (waarschuwing vlak voor het schot)")]
     public float telegraphTime = 0.5f;
     public Color telegraphColor = new Color(1f, 0.08f, 0.05f);
@@ -65,6 +76,13 @@ public class EnemyAI : MonoBehaviour
     public int maxHealth = 1;
     public int bodyDamage = 1;
     public int weakPointDamage = 3;
+
+    [Header("Hit-animatie (alleen voor enemies met meer levens, zoals de boss)")]
+    public bool playHitAnimation = false;   // aan = trigger "Hit" in de Animator bij een treffer
+    public float hitStunTime = 0.6f;        // zo lang staat hij stil na een treffer
+    public float hitCooldown = 1.5f;        // minimale tijd tussen twee hit-animaties (voorkomt stunlock)
+    public bool interruptAttack = false;    // uit = een lopende zwaardslag wordt niet onderbroken
+    public string attackStateName = "Shooting"; // naam van de aanval-state in de Animator
 
     [Header("Dood")]
     public float destroyAfter = 5f;
@@ -91,13 +109,12 @@ public class EnemyAI : MonoBehaviour
     private AudioClip[] footstepSounds = new AudioClip[6];
     private AudioSource audioSource;
     // ------------------------
+    public float destroyAfter = 5f;         // 0 = blijft liggen
 
     NavMeshAgent agent;
     Animator anim;
     Transform chest, rightUpperArm;
     Collider playerCollider;
-    float playerRadius = 0.4f;
-    readonly RaycastHit[] sightHits = new RaycastHit[16];
 
     bool canSee;
     float lastSeenTime;
@@ -110,6 +127,7 @@ public class EnemyAI : MonoBehaviour
     bool swinging;
     float swingTimer = -1f;
 
+    // Telegraphing
     Renderer glowRenderer;
     int glowIndex = -1;
     MaterialPropertyBlock mpb;
@@ -120,6 +138,8 @@ public class EnemyAI : MonoBehaviour
     float glow;
 
     int currentHealth;
+    float stunTimer;
+    float nextHitAnimTime;
 
     public bool IsDead => state == State.Dead;
     public int CurrentHealth => currentHealth;
@@ -168,12 +188,7 @@ public class EnemyAI : MonoBehaviour
             GameObject p = GameObject.FindGameObjectWithTag("Player");
             if (p != null) player = p.transform;
         }
-        if (player != null)
-        {
-            playerCollider = player.GetComponentInChildren<Collider>();
-            if (playerCollider != null)
-                playerRadius = Mathf.Max(playerCollider.bounds.extents.x, playerCollider.bounds.extents.z);
-        }
+        if (player != null) playerCollider = player.GetComponentInChildren<Collider>();
 
         currentHealth = Mathf.Max(1, maxHealth);
 
@@ -194,6 +209,17 @@ public class EnemyAI : MonoBehaviour
         canSee = CanSeePlayer();
         if (canSee) lastSeenTime = Time.time;
 
+        // Even stilstaan tijdens de hit-animatie
+        if (stunTimer > 0f)
+        {
+            stunTimer -= Time.deltaTime;
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+            anim.SetFloat("Speed", 0f);
+            UpdateGlow();
+            return;
+        }
+
         switch (state)
         {
             case State.Idle:   UpdateIdle();   break;
@@ -203,8 +229,6 @@ public class EnemyAI : MonoBehaviour
         }
 
         if (state == State.Dead) return;
-
-        UpdateSwing();
 
         anim.SetFloat("Speed", agent.velocity.magnitude);
         UpdateGlow();
@@ -260,6 +284,8 @@ public class EnemyAI : MonoBehaviour
         agent.SetDestination(player.position);   
 
         if (canSee && AttackDistance() <= EffectiveAttackRange())
+        // Binnen bereik EN zichtlijn -> stoppen en aanvallen
+        if (canSee && FlatDistanceToPlayer() <= attackRange)
         {
             state = State.Attack;
             shootTimer = Mathf.Max(reactionTime, telegraphTime);
@@ -276,8 +302,9 @@ public class EnemyAI : MonoBehaviour
     {
         agent.isStopped = true;
 
-        float margin = attackMode == AttackMode.Melee ? 0.5f : 1f;
-        if (!canSee || AttackDistance() > EffectiveAttackRange() + margin)
+
+        // Speler uit zicht of te ver weg (+1 m speling) -> weer achtervolgen
+        if (!canSee || FlatDistanceToPlayer() > attackRange + 1f)
         {
             StartChase();
             return;
@@ -291,103 +318,16 @@ public class EnemyAI : MonoBehaviour
 
         shootTimer -= Time.deltaTime;
 
+        // Vlak voor het schot: visor laten oplichten
         if (!telegraphing && shootTimer <= telegraphTime)
             StartTelegraph();
 
         if (shootTimer <= 0f)
         {
-            if (UseMelee())
-            {
-                StartSwing();
-                shootTimer = meleeInterval + Random.Range(-meleeRandomness, meleeRandomness);
-            }
-            else
-            {
-                anim.SetTrigger("Shoot");
-                shootTimer = shootInterval + Random.Range(-shootRandomness, shootRandomness);
-            }
-            fireTimeout = 1.5f;   
+            anim.SetTrigger("Shoot");
+            shootTimer = shootInterval + Random.Range(-shootRandomness, shootRandomness);
+            fireTimeout = 1.5f;   // vangnet als het Animation Event ontbreekt
         }
-    }
-
-    // ---------- Attack mode ----------
-
-    float EffectiveAttackRange()
-    {
-        return attackMode == AttackMode.Melee ? meleeRange : attackRange;
-    }
-
-    float MeleeDistance()
-    {
-        float r = agent != null ? agent.radius : 0.5f;
-        return Mathf.Max(0f, FlatDistanceToPlayer() - r - playerRadius);
-    }
-
-    float AttackDistance()
-    {
-        return attackMode == AttackMode.Melee ? MeleeDistance() : FlatDistanceToPlayer();
-    }
-
-    bool UseMelee()
-    {
-        switch (attackMode)
-        {
-            case AttackMode.Melee:  return true;
-            default:                return false;
-        }
-    }
-
-    // ---------- Zwaard ----------
-
-    void StartSwing()
-    {
-        swinging = true;
-        swingTimer = useAnimationEvent ? -1f : meleeHitDelay;
-
-        anim.SetTrigger("Shoot");
-        
-        // --- AUDIO ZWAARD ---
-        if (audioSource != null && swordSwingSound != null)
-        {
-            audioSource.pitch = Random.Range(0.9f, 1.1f);
-            audioSource.PlayOneShot(swordSwingSound, 1f); 
-        }
-        // --------------------
-    }
-
-    void UpdateSwing()
-    {
-        if (!swinging || swingTimer <= 0f) return;
-
-        swingTimer -= Time.deltaTime;
-        if (swingTimer <= 0f) OnSwordHit();
-    }
-
-    public void OnSwordHit()
-    {
-        if (state == State.Dead || !swinging) return;
-
-        swinging = false;
-        swingTimer = -1f;
-        telegraphing = false;
-        fireTimeout = -1f;
-
-        Vector3 to = player.position - transform.position;
-        to.y = 0f;
-        bool inReach = MeleeDistance() <= meleeRange + 0.75f;   
-        bool inArc = Vector3.Angle(transform.forward, to) <= meleeArc * 0.5f;
-
-        if (inReach && inArc && canSee)
-        {
-            ApplyMeleeDamage();
-            if (swordHitSound != null)
-                AudioSource.PlayClipAtPoint(swordHitSound, player.position);
-        }
-    }
-
-    void ApplyMeleeDamage()
-    {
-        player.gameObject.SendMessageUpwards("TakeDamage", meleeDamage, SendMessageOptions.DontRequireReceiver);
     }
 
     // ---------- Overgangen ----------
@@ -456,13 +396,7 @@ public class EnemyAI : MonoBehaviour
     {
         telegraphing = false;
         fireTimeout = -1f;
-        swinging = false;
-        swingTimer = -1f;
-        if (anim != null)
-        {
-            anim.ResetTrigger("Shoot");
-            if (hasSlashParam) anim.ResetTrigger(slashTrigger);
-        }
+        if (anim != null) anim.ResetTrigger("Shoot");
     }
 
     void UpdateGlow()
@@ -470,11 +404,7 @@ public class EnemyAI : MonoBehaviour
         if (fireTimeout > 0f)
         {
             fireTimeout -= Time.deltaTime;
-            if (fireTimeout <= 0f)
-            {
-                telegraphing = false;
-                swinging = false;
-            }
+            if (fireTimeout <= 0f) telegraphing = false;
         }
 
         if (telegraphing)
@@ -542,6 +472,10 @@ public class EnemyAI : MonoBehaviour
 
         if (closestHit == null) return true;
         return closestHit == player || closestHit.IsChildOf(player);
+        if (Physics.Raycast(from, dir / dist, out RaycastHit hit, dist + 0.5f, sightMask, QueryTriggerInteraction.Ignore))
+            return hit.transform == player || hit.transform.IsChildOf(player);
+
+        return true;
     }
 
     // ---------- Schieten & dood ----------
@@ -557,11 +491,10 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
+        if (state == State.Dead) return;
         recoil = 1f;
-        telegraphing = false;
+        telegraphing = false;   // visor dooft na het schot
         fireTimeout = -1f;
-
-        FireProjectile();
     }
 
     public void TakeHit(Collider hitCollider)
@@ -585,6 +518,27 @@ public class EnemyAI : MonoBehaviour
 
         if (state == State.Idle || state == State.Patrol)
             StartChase();
+
+        PlayHitReaction();
+    }
+
+    void PlayHitReaction()
+    {
+        if (!playHitAnimation || Time.time < nextHitAnimTime) return;
+
+        bool attacking = anim.GetCurrentAnimatorStateInfo(0).IsName(attackStateName)
+                         || anim.GetNextAnimatorStateInfo(0).IsName(attackStateName);
+        if (attacking && !interruptAttack) return;
+
+        nextHitAnimTime = Time.time + hitCooldown;
+        stunTimer = hitStunTime;
+
+        // Een lopende waarschuwing/aanval afbreken en na de hit opnieuw beginnen
+        CancelTelegraph();
+        if (state == State.Attack)
+            shootTimer = Mathf.Max(shootTimer, telegraphTime + 0.2f);
+
+        anim.SetTrigger("Hit");
     }
 
     public void Die()
@@ -598,8 +552,6 @@ public class EnemyAI : MonoBehaviour
             OnHealthChanged?.Invoke(0f);
         }
         telegraphing = false;
-        swinging = false;
-        swingTimer = -1f;
 
         agent.isStopped = true;
         agent.enabled = false;
@@ -609,11 +561,18 @@ public class EnemyAI : MonoBehaviour
 
         SetGlow(baseGlowColor * 0.2f, Color.black);
 
+        stunTimer = 0f;
+        if (playHitAnimation) anim.ResetTrigger("Hit");
+
         anim.SetFloat("Speed", 0f);
         anim.SetTrigger("Die");
 
         if (destroyAfter > 0f)
             Destroy(gameObject, destroyAfter);
+
+        // Tel de kill meteen, ook als het lichaam nog blijft liggen.
+        if (LevelManager.Instance != null)
+            LevelManager.Instance.NotifyEnemyKilled(gameObject);
     }
 
     // ---------- Recoil (na de animatie) ----------
@@ -725,3 +684,4 @@ public class EnemyAI : MonoBehaviour
         }
     }
 }
+
