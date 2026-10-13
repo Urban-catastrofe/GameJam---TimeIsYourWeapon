@@ -310,6 +310,13 @@ public class LevelManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        // The game over screen sends the player back to the menu itself.
+        if (!won && GameOverScreen.Instance != null)
+        {
+            GameOverScreen.Instance.Show();
+            return;
+        }
+
         SceneManager.LoadScene(menuSceneName);
     }
 }
