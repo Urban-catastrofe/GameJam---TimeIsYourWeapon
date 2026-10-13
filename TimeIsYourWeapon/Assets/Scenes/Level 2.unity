@@ -1156,7 +1156,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4147358631993994193, guid: 7927c8a4cd9d3f6478b75fc26c8ba482, type: 3}
       propertyPath: timeScaleKilledModifier
-      value: 0.1
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 4147358631993994193, guid: 7927c8a4cd9d3f6478b75fc26c8ba482, type: 3}
       propertyPath: timeScaleMovingModifier

@@ -529,8 +529,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4147358631993994193, guid: 7927c8a4cd9d3f6478b75fc26c8ba482, type: 3}
+      propertyPath: secondsRemaining
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 4147358631993994193, guid: 7927c8a4cd9d3f6478b75fc26c8ba482, type: 3}
       propertyPath: timeScaleKilledModifier
-      value: 0.1
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 4147358631993994193, guid: 7927c8a4cd9d3f6478b75fc26c8ba482, type: 3}
       propertyPath: timeScaleMovingModifier
@@ -1613,7 +1617,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea0cec72c4c41248b65a4106f1cf784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHealthBar
-  bossName: BOSS
+  bossName: Mitch
   hideAfterDeath: 2
 --- !u!1001 &931878854
 PrefabInstance:
@@ -3262,7 +3266,7 @@ MonoBehaviour:
   enemyBossEnabled: 1
   enemyBossPrefab: {fileID: 7106333766582623398, guid: 5e5d08fb7df033643b9c809865d0ec98, type: 3}
   enemyBossReinforcement: 1
-  enemyBossReinforcementDelay: 6.02
+  enemyBossReinforcementDelay: 6
   amountOfReinforcementsMin: 2
   amountOfReinforcementsMax: 6
   autoStart: 1

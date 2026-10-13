@@ -1040,8 +1040,8 @@ MonoBehaviour:
   interruptAttack: 0
   attackStateName: Shooting
   destroyAfter: 5
-  timeAddedMin: 2
-  timeAddedMax: 10
+  timeAddedMin: 60
+  timeAddedMax: 60
 --- !u!114 &6667891774222060085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1054,11 +1054,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e30d73e44884e369b29732ca2414b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMeleeWeapon
-  target: {fileID: 0}
-  damage: 25
   reach: 7
   arcAngle: 120
   maxHeightDifference: 4
+  extraSecondsRemoved: 0
   debugLog: 0
 --- !u!1 &7782850323402500698
 GameObject:

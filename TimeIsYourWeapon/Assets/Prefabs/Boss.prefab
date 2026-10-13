@@ -388,3 +388,5 @@ MonoBehaviour:
   interruptAttack: 0
   attackStateName: Shooting
   destroyAfter: 5
+  timeAddedMin: 60
+  timeAddedMax: 60

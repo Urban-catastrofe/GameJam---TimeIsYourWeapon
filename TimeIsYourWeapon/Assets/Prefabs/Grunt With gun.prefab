@@ -119,6 +119,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3355505708811292817}
     - target: {fileID: 8782072993656671234, guid: 86bbb56336c89284185aef900b426877, type: 3}
+      propertyPath: timeAddedMax
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8782072993656671234, guid: 86bbb56336c89284185aef900b426877, type: 3}
+      propertyPath: timeAddedMin
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8782072993656671234, guid: 86bbb56336c89284185aef900b426877, type: 3}
       propertyPath: projectileSpeed
       value: 5
       objectReference: {fileID: 0}

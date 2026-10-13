@@ -9,7 +9,7 @@ public class TimeManager : MonoBehaviour
     public float timeScaleStandingModifier = 0.25f;
     public float timeScaleMovingModifier = 1.0f;
     public float timeScaleRotatingModifier = 0.5f;
-    public float timeScaleKilledModifier = 0.1f;
+    public float timeScaleKilledModifier = 0.3f;
     #region Events
 
     public static event Action<float> OnTimeScaleChange;
