@@ -7,7 +7,7 @@ public class SettingsBehavior : MonoBehaviour
 {
     public AudioMixer mixer;
     
-    private string mainMenu = "MainMenu";
+    private string mainMenu = "MainScene";
     private int _uiVersion = 0;
     private string buttonName = "ReturnButton";
     private string sliderName = "MasterAudioSlider";
@@ -44,9 +44,7 @@ public class SettingsBehavior : MonoBehaviour
 
     private void LoadMainMenu()
     {
-        Debug.Log("werkt");
-        
-        // SceneManager.LoadScene(mainMenu);
+        SceneManager.LoadScene(mainMenu);
     }
 
 

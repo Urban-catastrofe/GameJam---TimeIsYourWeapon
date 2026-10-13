@@ -359,7 +359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a87be7c7ca73e462bb1c57ec6ff8cea4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SettingsBehavior
-  mixer: {fileID: 0}
+  mixer: {fileID: 24100000, guid: 9d7a462cc0c24226c81e2e4b7e6b03c0, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

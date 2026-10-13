@@ -88,7 +88,7 @@ public class Projectile : MonoBehaviour
 
         if (enemy != null && !enemy.IsDead)
         {
-            enemy.TakeHit(hit.collider);
+            enemy.Die();
         }
         else
         {
