@@ -310,10 +310,10 @@ public class LevelManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // The game over screen sends the player back to the menu itself.
-        if (!won && GameOverScreen.Instance != null)
+        // The win / game over screen sends the player back to the menu itself.
+        if (GameOverScreen.Instance != null)
         {
-            GameOverScreen.Instance.Show();
+            GameOverScreen.Instance.Show(won, reward);
             return;
         }
 

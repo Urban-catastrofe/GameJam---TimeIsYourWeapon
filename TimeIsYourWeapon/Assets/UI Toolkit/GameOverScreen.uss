@@ -49,3 +49,11 @@
     width: 80%;
     -unity-text-align: middle-center;
 }
+
+.game-over-root.is-won .game-over-panel {
+    border-color: rgb(73, 170, 90);
+}
+
+.game-over-root.is-won .game-over-title {
+    color: rgb(71, 255, 65);
+}
