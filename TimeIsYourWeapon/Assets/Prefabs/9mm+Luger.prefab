@@ -164,7 +164,6 @@ GameObject:
   - component: {fileID: 9084248629422876599}
   - component: {fileID: 1811927677838709035}
   - component: {fileID: 8884475963164844320}
-  - component: {fileID: -6448094685407726235}
   m_Layer: 0
   m_Name: 9mm+Luger
   m_TagString: Untagged
@@ -384,18 +383,3 @@ MonoBehaviour:
     m_Bits: 4294967295
   impactEffectPrefab: {fileID: 7838828485797834080, guid: ccb34478d93298443a46dde3c244614c, type: 3}
   impactEventName: Impact
---- !u!114 &-6448094685407726235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7282680755006457442}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5b843a86b4f9924b025fdec416b2bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BulletDamage
-  destroyOnEnemyHit: 1
-  destroyOnAnyHit: 1
-  lifetime: 5

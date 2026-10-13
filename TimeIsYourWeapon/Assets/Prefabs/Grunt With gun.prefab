@@ -64,7 +64,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 260
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8906731938591844480, guid: 9b22a09e889038f4fa22f5c5464613a5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -102,7 +103,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8543403946317559200, guid: 86bbb56336c89284185aef900b426877, type: 3}
       propertyPath: m_Name
-      value: Grunt Variant
+      value: Grunt With gun
       objectReference: {fileID: 0}
     - target: {fileID: 8782072993656671234, guid: 86bbb56336c89284185aef900b426877, type: 3}
       propertyPath: muzzle
