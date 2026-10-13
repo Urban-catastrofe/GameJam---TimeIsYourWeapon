@@ -326,9 +326,11 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   fireAction: {fileID: 1830069113069740138, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   animator: {fileID: 421285884143099104}
+  reloadAction: {fileID: -1850525799944772721, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   fireRate: 4
   magazineSize: 12
   aimRange: 100
+  reloadTimePenalty: 1
   muzzleFlash: {fileID: 3491128654971839281}
   muzzleFlashEvent: Shoot
   aimLayers:
