@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/Crosshair.uss?fileID=7433441132597879392&amp;guid=7df6d11da7654e0d9ded1aac9ee88bd0&amp;type=3#Crosshair"/>
+    <ui:VisualElement name="CrosshairRoot" picking-mode="Ignore" class="crosshair-root">
+        <ui:VisualElement name="Crosshair" picking-mode="Ignore" class="crosshair">
+            <ui:VisualElement name="CrosshairTop" picking-mode="Ignore" class="crosshair-line crosshair-line--top"/>
+            <ui:VisualElement name="CrosshairBottom" picking-mode="Ignore" class="crosshair-line crosshair-line--bottom"/>
+            <ui:VisualElement name="CrosshairLeft" picking-mode="Ignore" class="crosshair-line crosshair-line--left"/>
+            <ui:VisualElement name="CrosshairRight" picking-mode="Ignore" class="crosshair-line crosshair-line--right"/>
+            <ui:VisualElement name="CrosshairDot" picking-mode="Ignore" class="crosshair-dot"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
