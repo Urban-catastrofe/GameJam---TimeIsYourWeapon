@@ -958,7 +958,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -1372625422
   m_Radius: 0.8
-  m_Speed: 1.5
+  m_Speed: 9
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 180
@@ -1007,9 +1007,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   state: 0
   player: {fileID: 0}
-  detectRange: 30
-  viewAngle: 120
-  forgetAfter: 10
+  detectRange: 20
+  viewAngle: 360
+  forgetAfter: 1000000
   sightMask:
     serializedVersion: 2
     m_Bits: 115
@@ -1025,7 +1025,7 @@ MonoBehaviour:
   glowMaterialName: Enemy_Glow
   telegraphSound: {fileID: 0}
   patrolSpeed: 1.2
-  chaseSpeed: 2
+  chaseSpeed: 6
   patrolPoints: []
   waitAtPoint: 2
   recoilChest: 12
