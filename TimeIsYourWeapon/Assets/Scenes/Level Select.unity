@@ -368,8 +368,8 @@ MonoBehaviour:
     sceneName: Test scene Nils
   - displayName: Roald
     sceneName: Test scene Roald
-  - displayName: Simme
-    sceneName: Test scene Simme
+  - displayName: Level 2
+    sceneName: Level 2
   - displayName: Stijn
     sceneName: Test scene Stijn
   - displayName: Sybren
