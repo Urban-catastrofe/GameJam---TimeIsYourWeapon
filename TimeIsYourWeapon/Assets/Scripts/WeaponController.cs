@@ -28,9 +28,18 @@ public class WeaponController : MonoBehaviour
     
     [Header("Aim Collision")]
     [SerializeField] private LayerMask aimLayers = ~0;
+    
+    [Header("Recoil")]
+    [SerializeField] private Transform recoilTarget;
+    [SerializeField] private Vector3 recoilPosition = new Vector3(0f, 0.01f, -0.06f);
+    [SerializeField] private Vector3 recoilRotation = new Vector3(-6f, 0f, 0f);
+    [SerializeField, Min(0.01f)] private float recoilRecovery = 8f;
 
     private int currentAmmo;
     private float fireCooldown;
+    private Vector3 recoilRestPosition;
+    private Quaternion recoilRestRotation;
+    private float recoil;
 
     private void Awake()
     {
@@ -47,6 +56,22 @@ public class WeaponController : MonoBehaviour
         }
 
         currentAmmo = magazineSize;
+        
+        if (recoilTarget != null)
+        {
+            recoilRestPosition = recoilTarget.localPosition;
+            recoilRestRotation = recoilTarget.localRotation;
+        }
+    }
+    
+    private void OnDisable()
+    {
+        recoil = 0f;
+
+        if (recoilTarget == null) return;
+
+        recoilTarget.localPosition = recoilRestPosition;
+        recoilTarget.localRotation = recoilRestRotation;
     }
 
     private void Update()
@@ -114,6 +139,7 @@ public class WeaponController : MonoBehaviour
             Quaternion.LookRotation(direction));
 
         projectile.Initialize(direction);
+        recoil = 1f;
     }
     
     private void Reload()
@@ -128,5 +154,24 @@ public class WeaponController : MonoBehaviour
 
         if (TimeManager.Instance != null)
             TimeManager.Instance.RemoveSeconds(bulletsUsed * reloadTimePenalty);
+    }
+    
+    private void LateUpdate()
+    {
+        if (recoilTarget == null) return;
+
+        // Sharp kick, easing back into the resting pose.
+        float strength = recoil * recoil;
+
+        recoilTarget.localPosition =
+            recoilRestPosition + recoilPosition * strength;
+
+        recoilTarget.localRotation =
+            recoilRestRotation *
+            Quaternion.Euler(recoilRotation * strength);
+
+        // Recover even while the world is slowed or frozen.
+        recoil = Mathf.MoveTowards(
+            recoil, 0f, recoilRecovery * Time.unscaledDeltaTime);
     }
 }

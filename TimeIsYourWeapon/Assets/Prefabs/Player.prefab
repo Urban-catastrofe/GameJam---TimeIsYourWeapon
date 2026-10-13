@@ -274,6 +274,8 @@ MonoBehaviour:
   jumpHeight: 1.2
   gravity: -20
   ignoreTimeScale: 1
+  timeRemovedMin: 20
+  timeRemovedMax: 30
 --- !u!1 &1639234220693173669
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,6 +595,18 @@ PrefabInstance:
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 7607446305621817623}
+    - target: {fileID: 4387590971041247746, guid: e054914f88b90a44cadae6a5cfb6e7d6, type: 3}
+      propertyPath: recoilTarget
+      value: 
+      objectReference: {fileID: 7115048112385293048}
+    - target: {fileID: 4387590971041247746, guid: e054914f88b90a44cadae6a5cfb6e7d6, type: 3}
+      propertyPath: recoilPosition.y
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 4387590971041247746, guid: e054914f88b90a44cadae6a5cfb6e7d6, type: 3}
+      propertyPath: recoilPosition.z
+      value: -0.06
+      objectReference: {fileID: 0}
     - target: {fileID: 5084227238292900403, guid: e054914f88b90a44cadae6a5cfb6e7d6, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
