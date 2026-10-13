@@ -433,6 +433,7 @@ public class EnemyAI : MonoBehaviour
     public void Die()
     {
         if (state == State.Dead) return;
+        TimeManager.Instance.AddSeconds(Random.Range(1.0f, 5.0f));
         state = State.Dead;
         recoil = 0f;
         if (currentHealth != 0)
