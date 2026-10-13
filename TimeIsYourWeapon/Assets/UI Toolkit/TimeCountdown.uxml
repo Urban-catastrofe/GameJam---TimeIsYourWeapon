@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/TimeCountdown.uss?fileID=7433441132597879392&amp;guid=dac0c7029ca94aa479b153bd2d85588e&amp;type=3#TimeCountdown"/>
+    <ui:VisualElement name="HUDRoot" class="hud-root" style="flex-grow: 1;">
+        <ui:VisualElement name="TimerPanel" class="timer-panel" style="flex-grow: 1;">
+            <ui:Label text="00:00.0" name="TimerLabel" class="timer-label"/>
+            <ui:Label text="Hello World! With Style" name="PenaltyLabel" class="custom-label penalty-label"/>
+        </ui:VisualElement>
+        <ui:Label text="Time scale: 1.0x" name="TimeScaleLabel" class="time-scale-label" style="font-size: 16px; -unity-text-align: middle-center; -unity-font-style: bold; height: 8px;"/>
+    </ui:VisualElement>
+</ui:UXML>
