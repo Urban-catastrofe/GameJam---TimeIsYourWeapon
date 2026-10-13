@@ -376,7 +376,7 @@ public class EnemyAI : MonoBehaviour
 
     // ---------- Schieten & dood ----------
 
-    // Animation Event op het schietmoment in de Shooting-clip. Hier komt later de kogel.
+    // Animation Event op het aanvalsmoment (schot van de Grunt, zwaardslag van de boss).
     public void OnShootFrame()
     {
         if (state == State.Dead) return;
@@ -385,10 +385,15 @@ public class EnemyAI : MonoBehaviour
         telegraphing = false;
         fireTimeout = -1f;
 
+        // Grunt: kogel afvuren
         EnemyGunWeapon gun = GetComponent<EnemyGunWeapon>();
-
         if (gun != null)
             gun.Fire();
+
+        // Boss: zwaardslag
+        EnemyMeleeWeapon melee = GetComponent<EnemyMeleeWeapon>();
+        if (melee != null)
+            melee.Strike();
     }
 
     // Roep dit aan vanuit het kogelscript van de speler, met de collider die geraakt is.

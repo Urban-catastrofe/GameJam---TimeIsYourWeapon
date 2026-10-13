@@ -901,6 +901,7 @@ GameObject:
   - component: {fileID: 5407928904371507455}
   - component: {fileID: 3925136166664019562}
   - component: {fileID: 3510607374504257102}
+  - component: {fileID: 6667891774222060085}
   m_Layer: 6
   m_Name: Boss with Sword
   m_TagString: EnemyBoss
@@ -1030,7 +1031,7 @@ MonoBehaviour:
   recoilChest: 12
   recoilArm: 25
   recoilRecovery: 4
-  maxHealth: 3
+  maxHealth: 25
   bodyDamage: 1
   weakPointDamage: 3
   playHitAnimation: 1
@@ -1041,6 +1042,24 @@ MonoBehaviour:
   destroyAfter: 5
   timeAddedMin: 2
   timeAddedMax: 10
+--- !u!114 &6667891774222060085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7106333766582623398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14e30d73e44884e369b29732ca2414b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMeleeWeapon
+  target: {fileID: 0}
+  damage: 25
+  reach: 7
+  arcAngle: 120
+  maxHeightDifference: 4
+  debugLog: 0
 --- !u!1 &7782850323402500698
 GameObject:
   m_ObjectHideFlags: 0
