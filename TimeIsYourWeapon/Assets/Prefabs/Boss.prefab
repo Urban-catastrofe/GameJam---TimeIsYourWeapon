@@ -215,7 +215,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 58687072eefec0f23981df7795b6ce1c, type: 3}
       propertyPath: m_TagString
-      value: Enemy
+      value: EnemyBoss
       objectReference: {fileID: 0}
     - target: {fileID: 1082271958561512970, guid: 58687072eefec0f23981df7795b6ce1c, type: 3}
       propertyPath: m_Layer
@@ -362,22 +362,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 115
   eye: {fileID: 0}
-  attackMode: 0
   attackRange: 6
   shootInterval: 5
   shootRandomness: 0.5
   reactionTime: 0.6
   turnSpeed: 8
-  meleeRange: 4
-  meleeDamage: 40
-  meleeInterval: 5
-  meleeRandomness: 0.3
-  meleeArc: 100
-  slashTrigger: Shoot
-  useAnimationEvent: 1
-  meleeHitDelay: 0.35
-  swordSwingSound: {fileID: 0}
-  swordHitSound: {fileID: 0}
   telegraphTime: 0.8
   telegraphColor: {r: 1, g: 0.08, b: 0.05, a: 1}
   telegraphIntensity: 8
@@ -390,7 +379,7 @@ MonoBehaviour:
   recoilChest: 12
   recoilArm: 25
   recoilRecovery: 4
-  maxHealth: 10
+  maxHealth: 3
   bodyDamage: 1
   weakPointDamage: 3
   playHitAnimation: 1
@@ -399,11 +388,3 @@ MonoBehaviour:
   interruptAttack: 0
   attackStateName: Shooting
   destroyAfter: 5
-  projectilePrefab: {fileID: 0}
-  muzzle: {fileID: 0}
-  projectileSpeed: 20
-  projectileDamage: 25
-  projectileLifetime: 5
-  spreadAngle: 2
-  muzzleFlash: {fileID: 0}
-  muzzleFlashEvent: Shoot
