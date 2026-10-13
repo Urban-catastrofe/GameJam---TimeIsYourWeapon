@@ -16,8 +16,12 @@ public class TimeManager : MonoBehaviour
     
     private float originalFixedDeltaTime;
 
+    public static TimeManager Instance;
+
     void Awake()
     {
+        Instance = this;
+        
         originalFixedDeltaTime = Time.fixedDeltaTime;
         
         OnTimeScaleChange?.Invoke(1.0f);
