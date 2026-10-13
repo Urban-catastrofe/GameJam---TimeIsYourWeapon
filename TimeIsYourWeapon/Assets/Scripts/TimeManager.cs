@@ -39,7 +39,7 @@ public class TimeManager : MonoBehaviour
             OnTimeRemainingChange?.Invoke(secondsRemaining);
         }
         
-        OnTimerModified?.Invoke(secondsRemaining);
+        OnTimerEnded?.Invoke(secondsRemaining);
     }
 
     public void AddSeconds(float seconds)
