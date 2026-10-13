@@ -50,6 +50,18 @@ public class EnemyAI : MonoBehaviour
     public float recoilArm = 25f;
     public float recoilRecovery = 4f;
 
+    [Header("Health")]
+    public int maxHealth = 1;               // 1 = one hit KO (Grunt). Boss bijv. 10
+    public int bodyDamage = 1;              // schade per treffer op het lichaam
+    public int weakPointDamage = 3;         // schade per treffer op een collider met tag "WeakPoint"
+
+    [Header("Hit-animatie (alleen voor enemies met meer levens, zoals de boss)")]
+    public bool playHitAnimation = false;   // aan = trigger "Hit" in de Animator bij een treffer
+    public float hitStunTime = 0.6f;        // zo lang staat hij stil na een treffer
+    public float hitCooldown = 1.5f;        // minimale tijd tussen twee hit-animaties (voorkomt stunlock)
+    public bool interruptAttack = false;    // uit = een lopende zwaardslag wordt niet onderbroken
+    public string attackStateName = "Shooting"; // naam van de aanval-state in de Animator
+
     [Header("Dood")]
     public float destroyAfter = 5f;         // 0 = blijft liggen
 
@@ -75,7 +87,16 @@ public class EnemyAI : MonoBehaviour
     float fireTimeout = -1f;
     float glow;                             // 0 = normaal, 1 = volledig opgelicht
 
+    int currentHealth;
+    float stunTimer;
+    float nextHitAnimTime;
+
     public bool IsDead => state == State.Dead;
+    public int CurrentHealth => currentHealth;
+    public float HealthPercent => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f; // 0..1, handig voor de UI
+
+    // Wordt aangeroepen als de health verandert (voor de UI-klasgenoot): geeft HealthPercent door.
+    public event System.Action<float> OnHealthChanged;
 
     void Start()
     {
@@ -97,6 +118,8 @@ public class EnemyAI : MonoBehaviour
         }
         if (player != null) playerCollider = player.GetComponentInChildren<Collider>();
 
+        currentHealth = Mathf.Max(1, maxHealth);
+
         FindGlowMaterial();
         ReturnToCalm();
     }
@@ -106,11 +129,24 @@ public class EnemyAI : MonoBehaviour
         recoil = Mathf.Max(0f, recoil - recoilRecovery * Time.deltaTime);
 
         if (state == State.Dead) return;
-        if (Input.GetKeyDown(KeyCode.K)) { Die(); return; }
+        if (Input.GetKeyDown(KeyCode.K)) { Die(); return; }          // test: alles dood
+        if (Input.GetKeyDown(KeyCode.H)) { TakeDamage(bodyDamage); } // test: 1 treffer op het lichaam
+        if (state == State.Dead) return;
         if (player == null) return;
 
         canSee = CanSeePlayer();
         if (canSee) lastSeenTime = Time.time;
+
+        // Even stilstaan tijdens de hit-animatie
+        if (stunTimer > 0f)
+        {
+            stunTimer -= Time.deltaTime;
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+            anim.SetFloat("Speed", 0f);
+            UpdateGlow();
+            return;
+        }
 
         switch (state)
         {
@@ -350,12 +386,63 @@ public class EnemyAI : MonoBehaviour
         fireTimeout = -1f;
     }
 
-    // One hit KO: roep dit aan vanuit het kogelscript van de speler.
+    // Roep dit aan vanuit het kogelscript van de speler, met de collider die geraakt is.
+    // Raakt de kogel een collider met tag "WeakPoint", dan doet hij weakPointDamage, anders bodyDamage.
+    public void TakeHit(Collider hitCollider)
+    {
+        bool weak = hitCollider != null && hitCollider.CompareTag("WeakPoint");
+        TakeDamage(weak ? weakPointDamage : bodyDamage);
+    }
+
+    public void TakeDamage(int amount)
+    {
+        if (state == State.Dead || amount <= 0) return;
+
+        currentHealth = Mathf.Max(0, currentHealth - amount);
+        OnHealthChanged?.Invoke(HealthPercent);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+            return;
+        }
+
+        // Van achteren geraakt terwijl hij je nog niet zag? Dan weet hij nu waar je bent.
+        if (state == State.Idle || state == State.Patrol)
+            StartChase();
+
+        PlayHitReaction();
+    }
+
+    void PlayHitReaction()
+    {
+        if (!playHitAnimation || Time.time < nextHitAnimTime) return;
+
+        bool attacking = anim.GetCurrentAnimatorStateInfo(0).IsName(attackStateName)
+                         || anim.GetNextAnimatorStateInfo(0).IsName(attackStateName);
+        if (attacking && !interruptAttack) return;
+
+        nextHitAnimTime = Time.time + hitCooldown;
+        stunTimer = hitStunTime;
+
+        // Een lopende waarschuwing/aanval afbreken en na de hit opnieuw beginnen
+        CancelTelegraph();
+        if (state == State.Attack)
+            shootTimer = Mathf.Max(shootTimer, telegraphTime + 0.2f);
+
+        anim.SetTrigger("Hit");
+    }
+
     public void Die()
     {
         if (state == State.Dead) return;
         state = State.Dead;
         recoil = 0f;
+        if (currentHealth != 0)
+        {
+            currentHealth = 0;
+            OnHealthChanged?.Invoke(0f);
+        }
         telegraphing = false;
 
         agent.isStopped = true;
@@ -366,6 +453,9 @@ public class EnemyAI : MonoBehaviour
 
         // Visor gaat uit als hij dood is
         SetGlow(baseGlowColor * 0.2f, Color.black);
+
+        stunTimer = 0f;
+        if (playHitAnimation) anim.ResetTrigger("Hit");
 
         anim.SetFloat("Speed", 0f);
         anim.SetTrigger("Die");

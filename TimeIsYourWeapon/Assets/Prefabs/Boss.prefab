@@ -362,7 +362,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 115
   eye: {fileID: 0}
-  attackRange: 12
+  attackRange: 6
   shootInterval: 5
   shootRandomness: 0.5
   reactionTime: 0.6
@@ -379,4 +379,12 @@ MonoBehaviour:
   recoilChest: 12
   recoilArm: 25
   recoilRecovery: 4
+  maxHealth: 10
+  bodyDamage: 1
+  weakPointDamage: 3
+  playHitAnimation: 1
+  hitStunTime: 0.6
+  hitCooldown: 1.5
+  interruptAttack: 0
+  attackStateName: Shooting
   destroyAfter: 5
