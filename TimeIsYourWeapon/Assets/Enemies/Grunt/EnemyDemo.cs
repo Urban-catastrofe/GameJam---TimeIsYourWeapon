@@ -3,6 +3,7 @@ using UnityEngine.AI;
 
 // Enemy-demo: loopt naar de speler, schiet op afstand, met recoil.
 // One hit KO: één treffer = Die().  Testtoets: K = doodgaan.
+[RequireComponent(typeof(AudioSource))] // Zorgt dat de enemy automatisch een AudioSource krijgt
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyDemo : MonoBehaviour
 {
@@ -19,6 +20,15 @@ public class EnemyDemo : MonoBehaviour
     [Header("Dood")]
     public float destroyAfter = 5f;     // seconden na de dood tot het object verdwijnt (0 = blijft liggen)
 
+    // --- AUDIO TOEGEVOEGD ---
+    [Header("Audio")]
+    public float timeBetweenSteps = 0.35f;  
+    private float stepTimer = 0f;
+    private AudioClip shootSoundClip; 
+    private AudioClip[] footstepSounds = new AudioClip[6];
+    private AudioSource audioSource;
+    // ------------------------
+
     NavMeshAgent agent;
     Animator anim;
     Transform chest, rightUpperArm;
@@ -33,6 +43,17 @@ public class EnemyDemo : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponentInChildren<Animator>();
         agent.stoppingDistance = stopDistance;
+
+        // --- AUDIO INLADEN ---
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        
+        shootSoundClip = Resources.Load<AudioClip>("Audio/EnemyShoot");
+        for (int i = 0; i < 6; i++)
+        {
+            footstepSounds[i] = Resources.Load<AudioClip>("Audio/Footstep" + (i + 1));
+        }
+        // ---------------------
 
         // Botten opzoeken via de Humanoid-avatar (werkt voor elk Mixamo-model)
         chest = anim.GetBoneTransform(HumanBodyBones.UpperChest);
@@ -75,6 +96,22 @@ public class EnemyDemo : MonoBehaviour
                 shootTimer = shootInterval;
             }
         }
+
+        // --- VOETSTAPPEN LOGICA ---
+        if (agent.velocity.magnitude > 0.1f)
+        {
+            stepTimer -= Time.deltaTime;
+            if (stepTimer <= 0f)
+            {
+                PlayFootstep();
+                stepTimer = timeBetweenSteps; 
+            }
+        }
+        else
+        {
+            stepTimer = 0f; 
+        }
+        // --------------------------
     }
 
     // Wordt aangeroepen door een Animation Event op het schietmoment in de Shooting-clip.
@@ -83,6 +120,14 @@ public class EnemyDemo : MonoBehaviour
     {
         if (dead) return;
         recoil = 1f;
+
+        // --- AUDIO SCHIETEN ---
+        if (audioSource != null && shootSoundClip != null)
+        {
+            audioSource.pitch = 1f; // Terugzetten op normale hoogte na eventuele random voetstappen
+            audioSource.PlayOneShot(shootSoundClip);
+        }
+        // ----------------------
     }
 
     // Roep dit aan vanuit het kogelscript van de speler. One hit KO.
@@ -118,5 +163,21 @@ public class EnemyDemo : MonoBehaviour
 
         if (rightUpperArm != null)
             rightUpperArm.rotation = Quaternion.AngleAxis(-recoilArm * r, transform.right) * rightUpperArm.rotation;
+    }
+
+    // --- AUDIO HULPFUNCTIE ---
+    private void PlayFootstep()
+    {
+        if (footstepSounds != null && footstepSounds.Length > 0 && audioSource != null)
+        {
+            int randomIndex = Random.Range(0, footstepSounds.Length);
+            AudioClip clip = footstepSounds[randomIndex];
+
+            if (clip != null)
+            {
+                audioSource.pitch = Random.Range(0.85f, 1.15f); 
+                audioSource.PlayOneShot(clip, 0.4f); // Volume van de voetstap
+            }
+        }
     }
 }
