@@ -55,6 +55,13 @@ public class EnemyAI : MonoBehaviour
     public int bodyDamage = 1;              // schade per treffer op het lichaam
     public int weakPointDamage = 3;         // schade per treffer op een collider met tag "WeakPoint"
 
+    [Header("Hit-animatie (alleen voor enemies met meer levens, zoals de boss)")]
+    public bool playHitAnimation = false;   // aan = trigger "Hit" in de Animator bij een treffer
+    public float hitStunTime = 0.6f;        // zo lang staat hij stil na een treffer
+    public float hitCooldown = 1.5f;        // minimale tijd tussen twee hit-animaties (voorkomt stunlock)
+    public bool interruptAttack = false;    // uit = een lopende zwaardslag wordt niet onderbroken
+    public string attackStateName = "Shooting"; // naam van de aanval-state in de Animator
+
     [Header("Dood")]
     public float destroyAfter = 5f;         // 0 = blijft liggen
 
@@ -81,6 +88,8 @@ public class EnemyAI : MonoBehaviour
     float glow;                             // 0 = normaal, 1 = volledig opgelicht
 
     int currentHealth;
+    float stunTimer;
+    float nextHitAnimTime;
 
     public bool IsDead => state == State.Dead;
     public int CurrentHealth => currentHealth;
@@ -127,6 +136,17 @@ public class EnemyAI : MonoBehaviour
 
         canSee = CanSeePlayer();
         if (canSee) lastSeenTime = Time.time;
+
+        // Even stilstaan tijdens de hit-animatie
+        if (stunTimer > 0f)
+        {
+            stunTimer -= Time.deltaTime;
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+            anim.SetFloat("Speed", 0f);
+            UpdateGlow();
+            return;
+        }
 
         switch (state)
         {
@@ -390,6 +410,27 @@ public class EnemyAI : MonoBehaviour
         // Van achteren geraakt terwijl hij je nog niet zag? Dan weet hij nu waar je bent.
         if (state == State.Idle || state == State.Patrol)
             StartChase();
+
+        PlayHitReaction();
+    }
+
+    void PlayHitReaction()
+    {
+        if (!playHitAnimation || Time.time < nextHitAnimTime) return;
+
+        bool attacking = anim.GetCurrentAnimatorStateInfo(0).IsName(attackStateName)
+                         || anim.GetNextAnimatorStateInfo(0).IsName(attackStateName);
+        if (attacking && !interruptAttack) return;
+
+        nextHitAnimTime = Time.time + hitCooldown;
+        stunTimer = hitStunTime;
+
+        // Een lopende waarschuwing/aanval afbreken en na de hit opnieuw beginnen
+        CancelTelegraph();
+        if (state == State.Attack)
+            shootTimer = Mathf.Max(shootTimer, telegraphTime + 0.2f);
+
+        anim.SetTrigger("Hit");
     }
 
     public void Die()
@@ -412,6 +453,9 @@ public class EnemyAI : MonoBehaviour
 
         // Visor gaat uit als hij dood is
         SetGlow(baseGlowColor * 0.2f, Color.black);
+
+        stunTimer = 0f;
+        if (playHitAnimation) anim.ResetTrigger("Hit");
 
         anim.SetFloat("Speed", 0f);
         anim.SetTrigger("Die");
