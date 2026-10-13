@@ -71,7 +71,7 @@ public class EnemyMeleeWeapon : MonoBehaviour
         if (!hit) return;
 
         // Zelfde effect als een kogel: tijd eraf + OnPlayerHit-event (animatie enz.)
-        player.OnBulletHit();
+        player.OnPlayerDamaged();
 
         if (extraSecondsRemoved > 0f && TimeManager.Instance != null)
             TimeManager.Instance.RemoveSeconds(extraSecondsRemoved);
