@@ -14,11 +14,13 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Camera playerCamera;
     [SerializeField] private InputActionReference fireAction;
     [SerializeField] private Animator animator;
+    [SerializeField] private InputActionReference reloadAction; 
 
     [Header("Weapon Settings")]
     [SerializeField] private float fireRate = 4f;
     [SerializeField] private int magazineSize = 12;
     [SerializeField] private float aimRange = 100f;
+    [SerializeField] private float reloadTimePenalty = 1f;
     
     [Header("Effects")]
     [SerializeField] private VisualEffect muzzleFlash;
@@ -54,9 +56,18 @@ public class WeaponController : MonoBehaviour
         if (fireAction == null || fireAction.action == null)
             return;
 
-        if (fireAction.action.WasPressedThisFrame() &&
-            fireCooldown <= 0f &&
-            currentAmmo > 0)
+        bool reloadPressed = reloadAction != null && reloadAction.action != null
+            ? reloadAction.action.WasPressedThisFrame()
+            : Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
+
+        bool firePressed = fireAction.action.WasPressedThisFrame();
+        if (reloadPressed)
+        {
+            Reload();
+            return;
+        }
+
+        if (firePressed && fireCooldown <= 0f && currentAmmo > 0)
         {
             Fire();
         }
@@ -103,5 +114,19 @@ public class WeaponController : MonoBehaviour
             Quaternion.LookRotation(direction));
 
         projectile.Initialize(direction);
+    }
+    
+    private void Reload()
+    {
+        if (currentAmmo >= magazineSize)
+            return;
+        
+        animator.SetTrigger("Fire");
+        
+        var bulletsUsed = magazineSize - currentAmmo;
+        currentAmmo = magazineSize;
+
+        if (TimeManager.Instance != null)
+            TimeManager.Instance.RemoveSeconds(bulletsUsed * reloadTimePenalty);
     }
 }

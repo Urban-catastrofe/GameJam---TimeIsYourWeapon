@@ -3246,14 +3246,19 @@ MonoBehaviour:
   enemyBossEnabled: 1
   enemyBossPrefab: {fileID: 7106333766582623398, guid: 5e5d08fb7df033643b9c809865d0ec98, type: 3}
   enemyBossReinforcement: 1
-  enemyBossReinforcementDelay: 11.27
+  enemyBossReinforcementDelay: 6.02
   amountOfReinforcementsMin: 2
   amountOfReinforcementsMax: 6
   autoStart: 1
+  playerData: {fileID: 11400000, guid: c1215df3aa4e071abafb4f33e0233416, type: 2}
+  menuSceneName: MainScene
   onLevelStart:
     m_PersistentCalls:
       m_Calls: []
   onLevelComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  onLevelFailed:
     m_PersistentCalls:
       m_Calls: []
   onEnemyCountChanged:

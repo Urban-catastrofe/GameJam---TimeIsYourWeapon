@@ -4,23 +4,30 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Game/Player Data", fileName = "PlayerData")]
 public class PlayerData : ScriptableObject
 {
-    public int maxTime = 100;
+    public int maxTime = 100; // Starting balance for a new save.
 
-    // NonSerialized so playmode changes dont carry over
+    private const string SaveKey = "Player.TotalTime";
     [NonSerialized] private int time;
 
-    public event Action<int, int> TimeChanged; // old, and current time amount
+    public event Action<int, int> TimeChanged;
     public int Current => time;
 
-    private void OnEnable() => time = maxTime; // for now, this will do
+    private void OnEnable()
+    {
+        time = PlayerPrefs.GetInt(SaveKey, maxTime);
+    }
 
     public void SetTime(int value)
     {
         int old = time;
-        time = value;
+        time = Mathf.Max(0, value);
+
+        PlayerPrefs.SetInt(SaveKey, time);
+        PlayerPrefs.Save();
+
         TimeChanged?.Invoke(old, time);
     }
 
-    public void Damage(int damage) => SetTime(time - damage);
-    public void Recover(int heal) => SetTime(time + heal);
+    public void Damage(int amount) => SetTime(time - amount);
+    public void Recover(int amount) => SetTime(time + amount);
 }

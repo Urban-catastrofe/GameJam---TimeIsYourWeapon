@@ -39,10 +39,15 @@ public class LevelManager : MonoBehaviour
 
     [Header("Flow")]
     public bool autoStart = true;
+    
+    [Header("Level results")]
+    [SerializeField] private PlayerData playerData;
+    [SerializeField] private string menuSceneName = "MainScene";
 
     [Header("Events")]
-    public UnityEvent onLevelStart = new UnityEvent();
-    public UnityEvent onLevelComplete = new UnityEvent();
+    public UnityEvent onLevelStart      = new UnityEvent();
+    public UnityEvent onLevelComplete   = new UnityEvent();
+    public UnityEvent onLevelFailed     = new UnityEvent();   // <-- NEW
     public EnemyCountEvent onEnemyCountChanged = new EnemyCountEvent();
 
     public bool IsRunning { get; private set; }
@@ -58,6 +63,16 @@ public class LevelManager : MonoBehaviour
     readonly List<GameObject> enemies = new List<GameObject>();
 
     void Awake() => Instance = this;
+    
+    void OnEnable()
+    {
+        TimeManager.OnTimerEnded += HandleTimerEnded;
+    }
+
+    void OnDisable()
+    {
+        TimeManager.OnTimerEnded -= HandleTimerEnded;
+    }
 
     void OnDestroy()
     {
@@ -213,12 +228,13 @@ public class LevelManager : MonoBehaviour
 
     void CheckComplete()
     {
-        if (!IsRunning || IsComplete || TotalEnemies <= 0 || AliveEnemies > 0) return;
+        if (!IsRunning || IsComplete || TotalEnemies <= 0 ||
+            AliveEnemies > 0 || (enemyBossEnabled && bossInstance != null))
+        {
+            return;
+        }
 
-        IsComplete = true;
-        IsRunning = false;
-        onLevelComplete?.Invoke();  
-        Debug.Log($"[LevelManager] Level complete! All {TotalEnemies} enemies defeated.");
+        EndLevel(true);
     }
 
     static Transform FindFirstTagged(string tag)
@@ -242,5 +258,58 @@ public class LevelManager : MonoBehaviour
             int j = Random.Range(0, i + 1);
             (list[i], list[j]) = (list[j], list[i]);
         }
+    }
+    
+    void HandleTimerEnded()
+    {
+        EndLevel(false);
+    }
+    
+    void EndLevel(bool won)
+    {
+        if (!IsRunning) return;
+
+        IsRunning = false;
+        IsComplete = won;
+
+        TimeManager timer = TimeManager.Instance;
+        int reward = 0;
+
+        if (timer != null)
+        {
+            if (won)
+            {
+                reward = Mathf.FloorToInt(Mathf.Max(0f, timer.secondsRemaining));
+            }
+
+            timer.StopAllCoroutines(); // Stop the countdown.
+            timer.ChangeTimeScale(1f); // Restore time and physics speed.
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+        
+        if (reward > 0)
+        {
+            if (playerData != null)
+            {
+                playerData.Recover(reward);
+            }
+        }
+
+        if (won)
+        {
+            onLevelComplete?.Invoke();
+        }
+        else
+        {
+            onLevelFailed?.Invoke();
+        }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        SceneManager.LoadScene(menuSceneName);
     }
 }
