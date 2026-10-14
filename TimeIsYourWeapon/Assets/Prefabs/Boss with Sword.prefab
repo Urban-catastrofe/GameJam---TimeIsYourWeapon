@@ -1019,23 +1019,23 @@ MonoBehaviour:
   shootRandomness: 0.5
   reactionTime: 0.6
   turnSpeed: 8
-  telegraphTime: 0.8
+  telegraphTime: 0
   telegraphColor: {r: 1, g: 0.08, b: 0.05, a: 1}
   telegraphIntensity: 8
   glowMaterialName: Enemy_Glow
   telegraphSound: {fileID: 0}
-  patrolSpeed: 1.2
-  chaseSpeed: 6
+  patrolSpeed: 2
+  chaseSpeed: 10
   patrolPoints: []
   waitAtPoint: 2
   recoilChest: 12
   recoilArm: 25
   recoilRecovery: 4
-  maxHealth: 25
+  maxHealth: 40
   bodyDamage: 1
   weakPointDamage: 3
-  playHitAnimation: 1
-  hitStunTime: 0.6
+  playHitAnimation: 0
+  hitStunTime: 0
   hitCooldown: 1.5
   interruptAttack: 0
   attackStateName: Shooting
@@ -1054,8 +1054,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e30d73e44884e369b29732ca2414b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMeleeWeapon
-  reach: 7
-  arcAngle: 120
+  reach: 15
+  arcAngle: 360
   maxHeightDifference: 4
   extraSecondsRemoved: 0
   debugLog: 0

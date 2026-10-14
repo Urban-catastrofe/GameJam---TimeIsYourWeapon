@@ -3266,9 +3266,9 @@ MonoBehaviour:
   enemyBossEnabled: 1
   enemyBossPrefab: {fileID: 7106333766582623398, guid: 5e5d08fb7df033643b9c809865d0ec98, type: 3}
   enemyBossReinforcement: 1
-  enemyBossReinforcementDelay: 6
-  amountOfReinforcementsMin: 2
-  amountOfReinforcementsMax: 6
+  enemyBossReinforcementDelay: 4
+  amountOfReinforcementsMin: 10
+  amountOfReinforcementsMax: 10
   autoStart: 1
   playerData: {fileID: 11400000, guid: c1215df3aa4e071abafb4f33e0233416, type: 2}
   menuSceneName: MainScene
@@ -4745,8 +4745,8 @@ SceneRoots:
   - {fileID: 1948087592}
   - {fileID: 1274954995}
   - {fileID: 571578419}
-  - {fileID: 1549782550}
   - {fileID: 918273643}
+  - {fileID: 1549782550}
   - {fileID: 283105262}
   - {fileID: 780472767}
   - {fileID: 1730582911}
