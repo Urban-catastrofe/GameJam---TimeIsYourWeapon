@@ -29,7 +29,7 @@ public class Explosion : MonoBehaviour
     }
 
     // Spawns an explosion sized to fit around the renderers of target.
-    public static void SpawnAt(GameObject target, float sizeMultiplier = 1f)
+    public static void SpawnAt(GameObject target, float sizeMultiplier = 10f)
     {
         var renderers = target.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
