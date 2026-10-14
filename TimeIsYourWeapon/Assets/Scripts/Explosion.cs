@@ -8,6 +8,7 @@ public class Explosion : MonoBehaviour
 {
     const string MaterialPath = "VFX/ExplosionParticle"; // in a Resources folder so the shader ends up in builds
     const string SoundPath = "Audio/Explosion";
+    const float VolumeBoost = 3f;
     const float Lifetime = 5f;
 
     static Material additiveMaterial;
@@ -230,16 +231,24 @@ public class Explosion : MonoBehaviour
         if (sound == null) sound = Resources.Load<AudioClip>(SoundPath);
         if (sound == null) return;
 
-        var source = gameObject.AddComponent<AudioSource>();
-        source.clip = sound;
-        source.spatialBlend = 1f;
-        source.minDistance = 6f * scale;
-        source.maxDistance = 80f;
-        source.rolloffMode = AudioRolloffMode.Linear;
         // Bigger explosions sound deeper and louder
-        source.pitch = Mathf.Clamp(Random.Range(0.9f, 1.1f) / Mathf.Sqrt(scale), 0.6f, 1.4f);
-        source.volume = Mathf.Clamp(0.6f + 0.4f * scale, 0.5f, 1f);
-        source.Play();
+        float pitch = Mathf.Clamp(Random.Range(0.9f, 1.1f) / Mathf.Sqrt(scale), 0.6f, 1.4f);
+        float volume = Mathf.Clamp(0.6f + 0.4f * scale, 0.5f, 1f) * VolumeBoost;
+
+        // AudioSource.volume caps at 1, so stack identical sources in sync to go louder
+        int layers = Mathf.CeilToInt(volume);
+        for (int i = 0; i < layers; i++)
+        {
+            var source = gameObject.AddComponent<AudioSource>();
+            source.clip = sound;
+            source.spatialBlend = 1f;
+            source.minDistance = 6f * scale;
+            source.maxDistance = 80f;
+            source.rolloffMode = AudioRolloffMode.Linear;
+            source.pitch = pitch;
+            source.volume = volume / layers;
+            source.Play();
+        }
     }
 
     IEnumerator FadeLight(float duration, float intensity)
